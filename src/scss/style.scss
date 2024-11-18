@@ -1,0 +1,12 @@
+@use 'variables' as *;
+@use 'typography' as *;
+
+body {
+  @extend .mainFontFamily;
+  background-color: color('bg');
+  color: color('fg');
+  h1 {
+    @extend .heading1;
+    color: color('secondary');
+  }
+}

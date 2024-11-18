@@ -1,0 +1,13 @@
+$colors: (
+  'bg': #fff,
+  'fg': #000,
+  'primary': #f79f1a,
+  'onPrimary': #fff,
+  'secondary': #046e1b,
+  'label': #7f7d7d,
+  'bg1': #f1f3f7,
+);
+
+@function color($keyword) {
+  @return map-get($colors, $keyword);
+}

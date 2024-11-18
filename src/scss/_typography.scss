@@ -1,0 +1,54 @@
+// @import '~@fontsource/inter';
+// @use '~@fontsource/inter';
+// @import url('https://fonts.googleapis.com/css?family=Inter');
+
+$fontWeights: (
+  light: 300,
+  regular: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700,
+);
+
+@mixin fontWeight($keyword) {
+  font-weight: map-get($fontWeights, $keyword);
+}
+
+@mixin fontParams($fontSize, $lineHeight: auto, $spacing: null, $weight: null) {
+  font-size: $fontSize;
+  line-height: $lineHeight;
+  letter-spacing: $spacing;
+  font-weight: $weight; //If a property value is null, that property is omitted entirely.
+}
+
+.mainFontFamily {
+  font-family: inter, sans-serif;
+}
+
+.heading1 {
+  @include fontParams(64px, 80px, 0, 'bold');
+}
+.heading2 {
+  @include fontParams(46px, auto, -0.017em, 'semibold');
+}
+.heading3 {
+  @include fontParams(32px, auto, 0, 'semibold');
+}
+.subHeading1 {
+  @include fontParams(24px, auto, 0, 'semibold');
+}
+.subHeading2 {
+  @include fontParams(16px, auto, 0, 'medium');
+}
+.butonFont1 {
+  @include fontParams(20px, auto, 0.5px, 'semibold');
+}
+.paragraph1 {
+  @include fontParams(24px, auto, 0, 'light');
+}
+.paragraph2 {
+  @include fontParams(20px, auto, 0, 'medium');
+}
+.paragraph3 {
+  @include fontParams(16px, 24px, 0, 'light');
+}
