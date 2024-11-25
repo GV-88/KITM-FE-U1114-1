@@ -1,16 +1,16 @@
-import utilities from '../../utilities';
-// import api from '../api';
-// import storage from '../storage';
+import Utilities from '../../Utilities';
+// import * from '../Api';
+// import Storage from '../Storage';
 
 // callback hell?
 const card = function (initialData, isFavorite, behaviorType, getDetailsFn, onClickFn, onFavoriteFn) {
 	// let isFavoriteLocal = isFavorite ?? false;
 
-	const pictureElement = utilities.createElementExt('img', 'card__picture', {
+	const pictureElement = Utilities.createElementExt('img', 'card__picture', {
 		src: initialData.strMealThumb,
-		title: initialData.strMeal,
+		title: initialData.title,
 	});
-	const titleElement = utilities.createElementExt('h3', 'card__title', { title: initialData.strMeal }, initialData.strMeal);
+	const titleElement = Utilities.createElementExt('h3', 'card__title', { title: initialData.title }, initialData.title);
 
 	//TODO: class syntax & move to more fitting module
 	const quickDetails = [
@@ -34,52 +34,52 @@ const card = function (initialData, isFavorite, behaviorType, getDetailsFn, onCl
 		},
 	];
 
-	const quickDetailsElement = utilities.createElementExt('div', 'card__quickdetails');
+	const quickDetailsElement = Utilities.createElementExt('div', 'card__quickdetails');
 	for(const def of quickDetails) {
-		const detailElement = utilities.createElementExt('div', ['card__quickdetail', `card__quickdetail--${def.slug}`]);
+		const detailElement = Utilities.createElementExt('div', ['card__quickdetail', `card__quickdetail--${def.slug}`]);
 		detailElement.append(
-			utilities.createElementExt('i', ['quickdetail__icon', 'fa-solid', `fa-${def.icon}`]),
-			utilities.createElementExt('span', 'quickdetail__text', {}, def.displayFormatter(def.propertyGetter(initialData)))
+			Utilities.createElementExt('i', ['quickdetail__icon', 'fa-solid', `fa-${def.icon}`]),
+			Utilities.createElementExt('span', 'quickdetail__text', {}, def.displayFormatter(def.propertyGetter(initialData)))
 		);
 		quickDetailsElement.appendChild(detailElement);
 	}
 
 
-	// const favElement = utilities.createElementExt('i', ['card__fav', 'fav__icon', isFavoriteLocal ? 'fa-solid' : 'fa-regular', 'fa-star'], { 'data-id': initialData.idMeal });
+	// const favElement = Utilities.createElementExt('i', ['card__fav', 'fav__icon', isFavoriteLocal ? 'fa-solid' : 'fa-regular', 'fa-star'], { 'data-id': initialData.id });
 
-	const detailsElement = utilities.createElementExt('div', 'card__details', {
-		'data-id': initialData.idMeal,
+	const detailsElement = Utilities.createElementExt('div', 'card__details', {
+		'data-id': initialData.id,
 	});
 
-	const gotoItemElement = utilities.createElementExt('a', 'card__link', { 'data-id': initialData.idMeal }, 'View recipe');
+	const gotoItemElement = Utilities.createElementExt('a', 'card__link', { 'data-id': initialData.id }, 'View recipe');
 
-	const textContentElement = utilities.createElementExt('div', 'card__content');
+	const textContentElement = Utilities.createElementExt('div', 'card__content');
 
 	textContentElement.append(titleElement, quickDetailsElement, gotoItemElement);
 
-	const interactiveIconsElement = utilities.createElementExt('div', 'card__interactive-icons');
+	const interactiveIconsElement = Utilities.createElementExt('div', 'card__interactive-icons');
 	// interactiveIconsElement.append(favElement);
 
-	const cardElement = utilities.createElementExt('div', ['card', 'card--movie'], { 'data-id': initialData.idMeal });
+	const cardElement = Utilities.createElementExt('div', ['card', 'card--meal'], { 'data-id': initialData.id });
 	cardElement.append(pictureElement, textContentElement, detailsElement, interactiveIconsElement);
 
 	const collapsePhase1 = async () => {
 		cardElement.classList.remove('card--expanded');
-		utilities.smoothRemove(interactiveIconsElement, interactiveIconsElement.querySelector('.card__collapse-button'));
-		utilities.clearChildren(cardElement.querySelector('.card__details'));
+		Utilities.smoothRemove(interactiveIconsElement, interactiveIconsElement.querySelector('.card__collapse-button'));
+		Utilities.clearChildren(cardElement.querySelector('.card__details'));
 	};
 
 	const expand = () => {
 		cardElement.classList.add('card--expanded');
 		const collapseBtnElement = interactiveIconsElement.appendChild(
-			utilities.createElementExt('i', [
+			Utilities.createElementExt('i', [
 				'card__collapse-button',
 				'fa-solid',
 				// 'fa-xmark',
 				'fa-down-left-and-up-right-to-center',
 			])
 		);
-		utilities.scrollIntoViewIfNeeded(cardElement);
+		Utilities.scrollIntoViewIfNeeded(cardElement);
 		collapseBtnElement.addEventListener('click', collapse, { once: true });
 	};
 
@@ -96,9 +96,9 @@ const card = function (initialData, isFavorite, behaviorType, getDetailsFn, onCl
 
 	const loadDetailsAndExpand = async () => {
 		cardElement.classList.add('card--busy');
-		const detailsContent = await getDetailsFn(initialData.idMeal);
+		const detailsContent = await getDetailsFn(initialData.id);
 		if (detailsContent instanceof Node) {
-			utilities.clearChildren(detailsElement);
+			Utilities.clearChildren(detailsElement);
 			detailsElement.append(detailsContent);
 			expand();
 			cardElement.classList.remove('card--busy');
@@ -108,20 +108,6 @@ const card = function (initialData, isFavorite, behaviorType, getDetailsFn, onCl
 			}, 1000);
 		}
 	};
-
-	// favElement.addEventListener('click', async (e) => {
-	//   e.stopPropagation();
-	//   if (isFavoriteLocal) {
-	//     await storage.removeFromFavMovies(initialData.imdbID);
-	//     isFavoriteLocal = false;
-	//   } else {
-	//     await storage.addToFavMovies(initialData);
-	//     isFavoriteLocal = true;
-	//   }
-	//   utilities.toggleIconFill(favElement, isFavoriteLocal);
-
-	//   onFavoriteFn();
-	// });
 
 	switch (behaviorType) {
 		case 'expand':

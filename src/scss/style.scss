@@ -1,12 +1,13 @@
 @use 'variables' as *;
 @use 'typography' as *;
+@use 'layout' as *;
 
 body {
+  margin: 0;
   @extend .mainFontFamily;
-  background-color: color('bg');
-  color: color('fg');
-  h1 {
-    @extend .heading1;
-    color: color('secondary');
+  background-color: getColor('bg');
+  color: getColor('fg');
+  * {
+    box-sizing: border-box;
   }
 }

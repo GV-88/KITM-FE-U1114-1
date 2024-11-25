@@ -1,0 +1,52 @@
+@use 'sass:color';
+@use '../../scss/variables' as *;
+@use '../../scss/typography' as *;
+@use '../../scss/utilities' as *;
+
+.logo {
+  // $height: 29px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  &__title {
+    @include fontWeight('semibold');
+    font-size: 24px;
+    color: getColor('secondary');
+  }
+  &__graphic {
+    height: 19px;
+    color: getColor('primary');
+  }
+}
+
+.interactive-icon {
+  display: inline-block;
+  padding: 0.5em;
+  border-radius: 1em;
+  transition: 150ms;
+  cursor: pointer;
+  img {
+    display: block;
+    height: 1em;
+  }
+  &:hover {
+    background-color: color.scale($color: getColor('fg'), $alpha: -90%);
+  }
+}
+
+.btn {
+  padding: 0.5em;
+  border: none;
+  color: getColor('onPrimary');
+  background-color: getColor(primary);
+  transition: 150ms;
+  cursor: pointer;
+  &:hover {
+    background-color: color.scale($color: getColor('primary'), $lightness: 10%);
+  }
+  &:active {
+    background-color: color.scale($color: getColor('primary'), $lightness: -10%);
+  }
+  @include round();
+}

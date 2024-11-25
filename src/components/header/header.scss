@@ -1,0 +1,118 @@
+@use '../../scss/variables' as *;
+@use '../../scss/typography' as *;
+@use '../../scss/utilities' as *;
+
+.header {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5em;
+  padding: {
+    top: 1em;
+    bottom: 1em;
+  }
+  min-height: 6em;
+  &__block--nav {
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      text-transform: capitalize;
+      flex-flow: row wrap;
+      gap: 0.5em;
+      display: none;
+      @media (min-width: $sizeBreakpointSm) {
+        display: flex;
+      }
+      @media (min-width: $sizeBreakpointMd) {
+        gap: 1em;
+      }
+      @media (min-width: $sizeBreakpointLg) {
+        gap: 2em;
+      }
+      @media (min-width: $sizeBreakpointXl) {
+        gap: 2.5em;
+      }
+      @extend .paragraph2;
+      a {
+        @include resetLinkStyle();
+        padding: 0.5em 0;
+        &:hover {
+          color: getColor('secondary');
+        }
+      }
+    }
+    &::after {
+      content: '...';
+      @media (min-width: $sizeBreakpointSm) {
+        content: '';
+      }
+    }
+  }
+  &__block--buttons {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
+    .interactive-icon {
+      // background-color: #ccc;
+    }
+  }
+  .searchbar {
+    position: relative;
+    min-width: 3em;
+    height: 2em;
+    transition: 200ms;
+    &__wrapper {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: flex-end;
+      gap: 0.25em;
+      border-radius: 1em;
+    }
+    &__input-wrapper {
+      display: flex;
+      align-items: center;
+      border-radius: 1em;
+      transition: 200ms;
+    }
+    &__input {
+      font-size: 0.75em;
+      line-height: 2;
+      background: none;
+      border: none;
+      outline: none;
+      &::placeholder {
+        color: getColor('label');
+      }
+    }
+    &__button {
+      font-size: 0.75em;
+      padding: 0.5em 1em;
+    }
+    &__input,
+    &__button {
+      display: none;
+    }
+    &:hover,
+    &:focus,
+    &--expanded {
+      .searchbar__wrapper {
+        background-color: #fffd;
+        box-shadow: 0 0 0.5em 0.5em #fffd;
+      }
+      .searchbar__input-wrapper {
+        padding-left: 0.5em;
+        background-color: getColor('bg2');
+      }
+      .searchbar__input,
+      .searchbar__button {
+        display: inline-block;
+      }
+    }
+  }
+}

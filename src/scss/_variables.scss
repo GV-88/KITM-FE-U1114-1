@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 $colors: (
   'bg': #fff,
   'fg': #000,
@@ -6,8 +8,16 @@ $colors: (
   'secondary': #046e1b,
   'label': #7f7d7d,
   'bg1': #f1f3f7,
+  'bg2': #e1e3e7,
 );
 
-@function color($keyword) {
-  @return map-get($colors, $keyword);
+@function getColor($keyword) {
+  @return map.get($colors, $keyword);
 }
+
+$radius: 20px;
+
+$sizeBreakpointSm: 576px;
+$sizeBreakpointMd: 768px;
+$sizeBreakpointLg: 992px;
+$sizeBreakpointXl: 1200px;

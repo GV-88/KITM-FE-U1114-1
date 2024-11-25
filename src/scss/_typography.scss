@@ -1,6 +1,7 @@
 // @import '~@fontsource/inter';
 // @use '~@fontsource/inter';
 // @import url('https://fonts.googleapis.com/css?family=Inter');
+@use 'sass:map';
 
 $fontWeights: (
   light: 300,
@@ -11,14 +12,18 @@ $fontWeights: (
 );
 
 @mixin fontWeight($keyword) {
-  font-weight: map-get($fontWeights, $keyword);
+  font-weight: map.get($fontWeights, $keyword);
 }
 
 @mixin fontParams($fontSize, $lineHeight: auto, $spacing: null, $weight: null) {
+  $w: map.get($fontWeights, $weight);
+  @if $w == null {
+    $w: $weight;
+  }
+  font-weight: $w; //If a property value is null, that property is omitted entirely.
   font-size: $fontSize;
   line-height: $lineHeight;
   letter-spacing: $spacing;
-  font-weight: $weight; //If a property value is null, that property is omitted entirely.
 }
 
 .mainFontFamily {

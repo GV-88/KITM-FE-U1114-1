@@ -1,7 +1,10 @@
-//TODO: class syntax
+import Utilities from '../Utilities';
 
-const storage = {
-	getListFromLocalStorage: async function (key) {
+class Storage {
+
+	//#region generic storage methods
+
+	static async getListFromLocalStorage(key) {
 		let values = localStorage.getItem(key);
 		if (values === null) {
 			values = [];
@@ -9,7 +12,8 @@ const storage = {
 			values = JSON.parse(values);
 		}
 		return values;
-	},
+	}
+
 	/**
    * For storing a list of primitive values; always refreshes newest and removes oldest if needed
    * @param {string} key identifier for the whole list
@@ -17,11 +21,11 @@ const storage = {
    * @param {number} maxCount optional: how many values to keep in storage
    * @returns removed values, if any
    */
-	addToLocalStorageList: async function (key, val, maxCount) {
+	static async addToLocalStorageList(key, val, maxCount) {
 		//assume the array sort order persists;
 		//always put newly accessed values at the front, remove oldest to keep maxCount
 		let removedValues = [];
-		let valuesArray = await this.getListFromLocalStorage(key);
+		let valuesArray = await Storage.getListFromLocalStorage(key);
 		valuesArray = valuesArray.filter((i) => i !== val);
 		valuesArray.unshift(val);
 		if (maxCount) {
@@ -31,75 +35,132 @@ const storage = {
 		}
 		localStorage.setItem(key, JSON.stringify(valuesArray));
 		return removedValues;
-	},
-	removeFromLocalStorageList: async function (key, val) {
-		let valuesSet = new Set(await this.getListFromLocalStorage(key));
+	}
+
+	static async removeFromLocalStorageList(key, val) {
+		let valuesSet = new Set(await Storage.getListFromLocalStorage(key));
 		valuesSet.delete(val);
 		localStorage.setItem(key, JSON.stringify(Array.from(valuesSet)));
-	},
-	mealSearchesListName: 'TheMealDB_searches',
-	mealDetailsPrefix: 'TheMealDB_details_',
-	mealFavoritesPrefix: 'TheMealDB_fav_',
-	mealFavoritesListName: 'TheMealDB_fav',
-	mealSearchesMaxStorage: 30,
-	mealFavoritesMaxStorage: 20,
-	getMealSearches: async function () {
-		return this.getListFromLocalStorage(this.mealSearchesListName);
-	},
-	addToMealSearches: function (val) {
-		this.addToLocalStorageList(
-			this.mealSearchesListName,
+	}
+
+	//#endregion
+
+	//// idea for future: extend basic storage class
+
+	//#region methods specific to TheMealDB API
+	
+	static mealSearchesListName = 'TheMealDB_searches';
+	static mealCategoriesListName = 'TheMealDB_categories';
+	static mealAreasListName = 'TheMealDB_areas';
+	static mealIngredientsListName = 'TheMealDB_ingredients';
+	// static mealsListName = 'TheMealDB_meals';
+	static mealPrefix = 'TheMealDB_meal_';
+	static mealCategoryPrefix = 'TheMealDB_categories_';
+	static mealFavoritesPrefix = 'TheMealDB_fav_';
+	static mealFavoritesListName = 'TheMealDB_fav';
+	static mealSearchesMaxStorage = 30;
+	// static mealsMaxStorage = 20;
+	static mealFavoritesMaxStorage = 20; //TODO: use same storage pool for all meals (challenge to implement)
+	
+	static async getMealSearches() {
+		return Storage.getListFromLocalStorage(Storage.mealSearchesListName);
+	}
+
+	static addToMealSearches(val) {
+		Storage.addToLocalStorageList(
+			Storage.mealSearchesListName,
 			val,
-			this.mealSearchesMaxStorage
+			Storage.mealSearchesMaxStorage
 		);
-	},
-	clearSearchHistory: function () {
-		localStorage.removeItem(this.mealSearchesListName);
-	},
-	getMealDetails: async function (id) {
-		let data = sessionStorage.getItem(this.mealDetailsPrefix + id);
+	}
+
+	static clearSearchHistory() {
+		localStorage.removeItem(Storage.mealSearchesListName);
+	}
+
+	static async getMealIngredientNames() {
+		return Storage.getListFromLocalStorage(Storage.mealIngredientsListName);
+	}
+
+	static cacheMealIngredientNames(namesList) {
+		if(namesList?.length) {
+			localStorage.setItem(Storage.mealIngredientsListName, JSON.stringify(namesList));
+		}
+	}
+
+	static async getMealCategoryNames() {
+		return Storage.getListFromLocalStorage(Storage.mealCategoriesListName);
+	}
+
+	static cacheMealCategoryNames(namesList) {
+		if(namesList?.length) {
+			localStorage.setItem(Storage.mealCategoriesListName, JSON.stringify(namesList));
+		}
+	}
+
+	static async getMeal(id) {
+		let data = sessionStorage.getItem(Storage.mealPrefix + id);
 		return data === null ? null : JSON.parse(data);
-	},
-	saveMealDetails: function (data) {
+	}
+
+	static saveMeal(data) {
 		sessionStorage.setItem(
-			this.mealDetailsPrefix + data.idMeal,
+			Storage.mealPrefix + data.idMeal,
 			JSON.stringify(data)
 		);
-	},
-	getFavMealsList: async function () {
-		return this.getListFromLocalStorage(this.mealFavoritesListName);
-	},
-	getAllFavMeals: async function () {
+	}
+
+	static async getCategory(strCategory) {
+		let data = sessionStorage.getItem(Storage.mealCategoryPrefix + Utilities.cleanString(strCategory));
+		return data === null ? null : JSON.parse(data);
+	}
+
+	static saveCategory(data) {
+		sessionStorage.setItem(
+			Storage.mealCategoryPrefix + Utilities.cleanString(data?.strCategory),
+			JSON.stringify(data)
+		);
+	}
+
+	static async getFavMealsList() {
+		return Storage.getListFromLocalStorage(Storage.mealFavoritesListName);
+	}
+
+	static async getAllFavMeals() {
 		let values = [];
-		const ids = await this.getFavMealsList();
+		const ids = await Storage.getFavMealsList();
 		if (Array.isArray(ids)) {
 			for (const id of ids) {
-				let data = localStorage.getItem(this.mealFavoritesPrefix + id);
+				let data = localStorage.getItem(Storage.mealFavoritesPrefix + id);
 				if (data !== null) {
 					values.push(JSON.parse(data));
 				}
 			}
 		}
 		return values;
-	},
-	addToFavMeals: async function (data) {
-		const entriesToRemove = await this.addToLocalStorageList(
-			this.mealFavoritesListName,
+	}
+
+	static async addToFavMeals(data) {
+		const entriesToRemove = await Storage.addToLocalStorageList(
+			Storage.mealFavoritesListName,
 			data.idMeal,
-			this.mealFavoritesMaxStorage
+			Storage.mealFavoritesMaxStorage
 		);
 		for (const id of entriesToRemove) {
-			localStorage.removeItem(this.mealFavoritesPrefix + id);
+			localStorage.removeItem(Storage.mealFavoritesPrefix + id);
 		}
 		localStorage.setItem(
-			this.mealFavoritesPrefix + data.idMeal,
+			Storage.mealFavoritesPrefix + data.idMeal,
 			JSON.stringify(data)
 		);
-	},
-	removeFromFavMeals: async function (id) {
-		this.removeFromLocalStorageList(this.mealFavoritesListName, id);
-		localStorage.removeItem(this.mealFavoritesPrefix + id);
-	},
+	}
+
+	static async removeFromFavMeals(id) {
+		Storage.removeFromLocalStorageList(Storage.mealFavoritesListName, id);
+		localStorage.removeItem(Storage.mealFavoritesPrefix + id);
+	}
+
+	//#endregion
 };
 
-export default storage;
+export default Storage;

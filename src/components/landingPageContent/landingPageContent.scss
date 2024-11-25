@@ -1,0 +1,58 @@
+@use '../../scss/variables' as *;
+@use '../../scss/typography' as *;
+@use '../../scss/utilities' as *;
+
+.hero {
+  display: flex;
+  flex-flow: row wrap;
+  &__text-content {
+    flex: 1 0 21em;
+  }
+  &__title {
+    @extend .heading1;
+    text-transform: capitalize;
+    margin-bottom: 0.5em;
+  }
+  &__text {
+    @extend .paragraph3;
+    margin-top: 0.25em;
+    margin-bottom: 3.5em;
+  }
+  &__link {
+    @include resetLinkStyle(getColor('primary'));
+  }
+  &__button {
+    @include fontParams(20px, auto, 0.5px, 'semibold');
+    text-transform: capitalize;
+    padding: 1.5em 2em;
+  }
+  &__illustration {
+    max-height: 640px;
+    flex: 1 1;
+    display: flex;
+    justify-content: center;
+  }
+  &__picture {
+    height: 100%;
+  }
+}
+
+.list-header {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: start;
+  &__title {
+    @extend .heading2;
+    text-transform: capitalize;
+    margin-top: 0;
+    margin-bottom: 0.25em;
+  }
+  &__subtitle {
+    @extend .paragraph1;
+  }
+  &__button {
+    @extend .butonFont1;
+    padding: 1em 2em;
+  }
+}

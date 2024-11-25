@@ -1,0 +1,29 @@
+@use './variables' as *;
+
+.inner-container {
+  display: contents;
+}
+
+body {
+  --maxContentWidth: 1280px;
+  --pad: 8px;
+  @media (min-width: $sizeBreakpointSm) {
+    --pad: 16px;
+  }
+  @media (min-width: $sizeBreakpointMd) {
+    --pad: 32px;
+  }
+  @media (min-width: $sizeBreakpointLg) {
+    --pad: 50px;
+  }
+  @media (min-width: $sizeBreakpointXl) {
+    --pad: 100px;
+  }
+  & > *,
+  .inner-container > * {
+    padding: {
+      left: max(var(--pad), (100% - var(--maxContentWidth)) * 0.5);
+      right: max(var(--pad), (100% - var(--maxContentWidth)) * 0.5);
+    }
+  }
+}

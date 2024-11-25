@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 
 //TODO: try using postcss-urlrebase to fix relative URL for npm font libraries (or output.publicPath?)
 
@@ -18,7 +19,7 @@ module.exports = (env) => ({
 	module: {
 		rules: [
 			{
-				//transpile js code
+			//transpile js code
 				test: /\.js$/,
 				exclude: /node_modules/,
 				use: {
@@ -33,6 +34,11 @@ module.exports = (env) => ({
 				type: 'asset/resource',
 				generator: { filename: 'assets/fonts/[base]' },
 			},
+			// {
+			// 	test: /\.(svg|png)$/,
+			// 	type: 'asset/resource',
+			// 	generator: { filename: 'assets/[base]' },
+			// },
 			{
 				test: /\.s?css$/, //compile scss to css
 				use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
@@ -47,13 +53,26 @@ module.exports = (env) => ({
 		new MiniCssExtractPlugin({
 			filename: 'style.css',
 		}),
+		new CopyPlugin({
+			patterns: [
+				{
+					from: '**/*',
+					context: path.resolve(__dirname, 'src', 'assets'),
+					to: path.resolve(__dirname, 'public', 'assets', '[file]')
+				},
+				{
+					from: 'working/response_sample*.json',
+					to: path.resolve(__dirname, 'public', 'test_data', '[base]')
+				},
+			].slice(0, env.development ? 2 : -1) //better practice would be to have separate config file for dev
+		}),
 		new ESLintPlugin({
-			// https://eslint.org/docs/latest/integrate/nodejs-api#-new-eslintoptions
+		// https://eslint.org/docs/latest/integrate/nodejs-api#-new-eslintoptions
 			configType: 'flat',
-			// overrideConfigFile: '.eslint.config.js',
+		// overrideConfigFile: '.eslint.config.js',
 		}),
 		new Dotenv({
-			path: `./.env.${env}`
+			path: `./.env.${env.development ? 'development' : 'production'}`
 		}),
 	],
 	devServer: {

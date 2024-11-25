@@ -1,0 +1,18 @@
+@use 'variables' as *;
+
+@mixin resetLinkStyle($foregroundColor: inherit) {
+  text-decoration: none;
+  color: $foregroundColor;
+  & a {
+    text-decoration: none;
+    color: $foregroundColor;
+  }
+}
+
+@mixin round($radius: $radius) {
+  border-radius: $radius;
+}
+
+.hidden {
+  display: none;
+}

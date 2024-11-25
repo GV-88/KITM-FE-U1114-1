@@ -1,0 +1,13 @@
+@use '../../scss/variables' as *;
+@use '../../scss/typography' as *;
+@use '../../scss/utilities' as *;
+
+.search-block {
+  background-color: getColor('bg2');
+  @include round();
+  flex-grow: 1;
+  flex-basis: 34%;
+  &--letter {
+    flex-basis: 68%;
+  }
+}
