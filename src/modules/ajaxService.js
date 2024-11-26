@@ -19,9 +19,11 @@ class AjaxService {
 			const baseUrl =
 				envStatus === 'dev' ? 'http://localhost' : 'https://www.themealdb.com';
 			let url = new URL(baseUrl);
+			console.log(query);
+			
 			if (envStatus === 'dev') {
 				url.port = window.location.port;
-				url.pathname = `/test_data/response_sample_${endpoint}${Object.keys(query ?? {}).length === 0 ? '' : '_' + AjaxService.queryParamsTranslation[(Object.keys(query))[0]] + '_' + (Object.keys(query))[0].toLowerCase()}.json`;
+				url.pathname = `/test_data/response_sample_${endpoint}${Object.keys(query ?? {}).length === 0 ? '' : '_' + AjaxService.queryParamsTranslation[(Object.keys(query))[0]] + '_' + Object.values(query)[0].toLowerCase()}.json`;
 			}
 			else {
 				url.pathname = `/api/json/v1/1/${endpoint}.php`;

@@ -6,7 +6,7 @@ import ItemBlockMealCategory from './ItemBlockMealCategory';
 import ItemBlockMealIngredient from './ItemBlockMealIngredient';
 
 class SearchForm {
-	constructor(resultsCallback, ingredientsLib, categoriesLib, areasLib) {
+	constructor(resultsCallback, ingredientsLib, categoriesLib, areasLib) {		
 		this.isInitialised = false;
 		this.resultsCallback = resultsCallback;
 		this.ingredientsLib = ingredientsLib; // should work as reference to object?
@@ -22,18 +22,18 @@ class SearchForm {
 
 	async init() {
 		this.ingredientsList = new ItemBlockList(
-			(...args) => {new ItemBlockMealIngredient(...args);},
+			(...args) => {return new ItemBlockMealIngredient(...args);},
 			this.ingredientsLib,
 			this.doSearch
 		);
 		this.categoriesList = new ItemBlockList(
-			(...args) => {new ItemBlockMealCategory(...args);},
+			(...args) => {return new ItemBlockMealCategory(...args);},
 			this.categoriesLib,
 			this.doSearch
 		);
 		this.areasList = new ItemBlockList(
-			(...args) => {new ItemBlockMealArea(...args);},
-			this.areasList,
+			(...args) => {return new ItemBlockMealArea(...args);},
+			this.areasLib,
 			this.doSearch
 		);
 		this.formElement = Utilities.createElementExt('form', SearchForm.className, {workspace: ''});
@@ -42,7 +42,7 @@ class SearchForm {
 			searchBlock('List by first letter', 'letter', 'firstLetter', this.doSearch),
 			searchBlock('List by category', 'list', 'category', null, this.categoriesList),
 			searchBlock('List by area', 'list', 'area', null, this.areasList),
-			searchBlock('List by ingredients', 'list', 'ingredient', null, this.ingredientsLib),
+			searchBlock('List by ingredients', 'list', 'ingredient', null, this.ingredientsList),
 			searchBlock('Surprise me', 'random', null),
 		);
 		this.isInitialised = true;

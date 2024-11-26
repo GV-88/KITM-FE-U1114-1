@@ -37,6 +37,8 @@ class ItemBlockList {
 
 	async updateList() {
 		this.namesList = await this.source.getList();
+		console.log('updateList()', this.namesList);
+		
 		Utilities.clearChildren(this.listElement);
 		await this.fillContent();
 	}

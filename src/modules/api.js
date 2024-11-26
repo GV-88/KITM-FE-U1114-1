@@ -100,58 +100,55 @@ export class MealsApi {
 	static async searchMeals(query) {
 		let endpoint = query?.id ? 'lookup' : 'search';
 		if(query?.searchstring) { Storage.addToMealSearches(query.searchstring); }
-		return AjaxService.get(endpoint, query).then((data) => MealsApi.parseMealRecipes(data?.meals), () => null);
+		const data = await AjaxService.get(endpoint, query);
+		return MealsApi.parseMealRecipes(data?.meals);
 	};
 
 	static async FilterMeals(query) {
-		return AjaxService.get('filter', query).then((data) => MealsApi.parseMealPreviews(data?.meals), () => null);
+		const data = await AjaxService.get('filter', query);
+		return MealsApi.parseMealPreviews(data?.meals);
 	};
 
-	static getAllIngredients() {
-		return AjaxService.get('list', {ingredient: 'list'}).then(
-			(data) => {
-				let ingredients = [];
-				if(data?.meals) {
-					ingredients = MealsApi.parseIngredients(data?.meals);
-					Storage.cacheMealIngredientNames(ingredients.map(i => i?.title));
-				}
-				return ingredients;
-			},
-			() => null
-		);
+	static async getAllIngredients() {
+		const data = await AjaxService.get('list', {ingredient: 'list'});
+		let ingredients = [];
+		if(data?.meals) {
+			ingredients = MealsApi.parseIngredients(data?.meals);
+			Storage.cacheMealIngredientNames(ingredients.map(i => i?.title));
+		}
+		return ingredients;
 	}
 
-	static getAllCategories() {
-		return AjaxService.get('categories').then(
-			(data) => {
-				let categories = [];
-				if (data?.categories) {
-					categories = MealsApi.parseCategories(data?.categories);
-					Storage.cacheMealCategoryNames(categories.map(i => i?.title));
-				}
-				return categories;
-			},
-			() => null
-		);
+	static async getAllCategories() {
+		const data = await AjaxService.get('categories');
+		let categories = [];
+		if (data?.categories) {
+			categories = MealsApi.parseCategories(data?.categories);
+			Storage.cacheMealCategoryNames(categories.map(i => i?.title));
+		}
+		return categories;
 	}
 
 	static async getCategoryList() {
 		let list = await Storage.getMealCategoryNames();
-		if (list === null) {
-			return AjaxService.get('list', {category: 'list'}).then(
-				(data) => {
-					list = data?.meals ? data.meals.map(i => i?.strCategory) : [];
-					Storage.cacheMealCategoryNames(list);
-					return list;
-				},
-				() => null
-			);
+		if (!list?.length) {
+			const data = await AjaxService.get('list', {category: 'list'});
+			list = data?.meals ? data.meals.map(i => i?.strCategory) : [];
+			Storage.cacheMealCategoryNames(list);
+			return list;
 		}
 		return list;
 	}
 	
-	static getAreaList() {
-		return AjaxService.get('list', {area: 'list'}).then((data) => data?.meals ? data.meals.map(areaData => areaData?.strArea) : [], () => null);
+	static async getAreaList() {
+		let list = await Storage.getMealAreas();
+		if (!list?.length) {
+			const data = await AjaxService.get('list', {area: 'list'});
+			list = data?.meals ? data.meals.map(areaData => areaData?.strArea) : [];
+			Storage.cacheMealAreas(list);
+			return list;
+		}
+		return list;
 	}
 
 	// static async getIngredientList() {
@@ -204,8 +201,8 @@ export class LazyLoadingLibrary {
 		if(this.list?.length) {
 			return this.list;
 		}
-		this.list = await this.listLoader();
-		if (this.list?.length && !cacheOnly) {
+		this.list = await this.listLoader();	
+		if (!(this.list?.length) && !cacheOnly) {
 			await this.loadLibrary();
 			return this.list;
 		}
@@ -229,11 +226,11 @@ export class IngredientsLibrary extends LazyLoadingLibrary {
 	};
 
 	async libraryLoader() {
-		return MealsApi.getAllIngredients;
+		return MealsApi.getAllIngredients();
 	}
 
 	async listLoader() {
-		return Storage.getMealIngredientNames;
+		return Storage.getMealIngredientNames();
 	}
 }
 
@@ -245,16 +242,16 @@ export class CategoriesLibrary extends LazyLoadingLibrary {
 	};
 
 	async libraryLoader() {
-		return MealsApi.getAllCategories;
+		return MealsApi.getAllCategories();
 	}
 
 	async listLoader() {
-		return MealsApi.getCategoryList;
+		return MealsApi.getCategoryList();
 	}
 }
 
 export class AreasLibrary extends LazyLoadingLibrary {
 	async listLoader() {
-		return MealsApi.getAreaList;
+		return MealsApi.getAreaList();
 	}
 }

@@ -98,6 +98,16 @@ class Storage {
 		}
 	}
 
+	static async getMealAreas() {
+		return Storage.getListFromLocalStorage(Storage.mealAreasListName);
+	}
+
+	static cacheMealAreas(namesList) {
+		if(namesList?.length) {
+			localStorage.setItem(Storage.mealAreasListName, JSON.stringify(namesList));
+		}
+	}
+
 	static async getMeal(id) {
 		let data = sessionStorage.getItem(Storage.mealPrefix + id);
 		return data === null ? null : JSON.parse(data);

@@ -34,8 +34,8 @@ const buildLandingPageContent = async () => {
 		mealsListElement, //moves if existing
 	);
 	await mealsListObj.setHeaderElement(listHeader());
-	innerContainerElement.querySelector('.hero__button').addEventListener('click', switchToBrowsingMode);
-	mealsListElement.querySelector('.list-header__button').addEventListener('click', switchToBrowsingMode);
+	innerContainerElement.querySelector('.hero__button').addEventListener('click', () => switchToBrowsingMode());
+	mealsListElement.querySelector('.list-header__button').addEventListener('click', () => switchToBrowsingMode());
 };
 
 const switchToBrowsingMode = async (prefillSearch) => {

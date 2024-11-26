@@ -35,7 +35,7 @@ const searchBlock = (label, type, queryFieldName, onSearch, listObj) => {
 					datalistElement.appendChild(Utilities.createElementExt('option', [], {value: str}));
 				}
 				searchBlockElement.appendChild(datalistElement);
-				listInputElement.list = 'datalist-' + queryFieldName;
+				listInputElement.setAttribute('list', 'datalist-' + queryFieldName);
 			}
 		};
 
@@ -43,6 +43,7 @@ const searchBlock = (label, type, queryFieldName, onSearch, listObj) => {
 			isExpandedState = undefined;
 			toggleListButton.querySelector('img').src = 'assets/circle-chevron-down-solid.svg';
 			listLabelElement.classList.add('hidden');
+			//TODO: visually limit the list size
 			if(!listObj.isInitialised) {
 				await listObj.init();
 			} else {
@@ -75,18 +76,26 @@ const searchBlock = (label, type, queryFieldName, onSearch, listObj) => {
 		const listHeaderElement = Utilities.createElementExt('div','search-block__list-header');
 		const toggleListButton = interactiveIcon('/assets/circle-chevron-right-solid.svg');
 		const listLabelElement = Utilities.createElementExt('div', 'search-block__list-label', {}, 'show list');
+		const buttonElement = searchBlockElement.appendChild(
+			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit', name: queryFieldName}, 'List meals')
+		);
 		listHeaderElement.append( toggleListButton, listLabelElement);
-		searchBlockElement.append(listInputElement, listHeaderElement);
+		searchBlockElement.append(listInputElement, buttonElement, listHeaderElement);
 		fillInputOptions();
-		toggleListButton.addEventListener('click', () => toggleList);
-		listLabelElement.addEventListener('click', () => toggleList);
+		toggleListButton.addEventListener('click', toggleList);
+		listLabelElement.addEventListener('click', toggleList);
+
+		buttonElement.addEventListener('click', (e) => {
+			e.preventDefault();
+			onSearch({[queryFieldName]: listInputElement.value});
+		});
 	}
 	if(type === 'letter') {
 		searchBlockElement.classList.add('search-block--letter');
 		const alphabetElement = searchBlockElement.appendChild(
 			Utilities.createElementExt('div', 'search-block__alphabet')
 		);
-		for (let a in Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ')) {
+		for (let a of Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ')) {
 			const letterElement = Utilities.createElementExt('span', 'search-block__letter', {'data-letter': a}, a);
 			alphabetElement.appendChild(letterElement);
 			letterElement.addEventListener('click', (e) => {

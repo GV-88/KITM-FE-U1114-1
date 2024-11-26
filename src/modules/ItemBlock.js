@@ -65,6 +65,7 @@ class ItemBlock {
 			const buttonGroupElement = Utilities.createElementExt('div', 'item-block__button-group');
 			if(this.availableActions.includes('search')) {
 				this.searchButtonElement = interactiveIcon('assets/search.svg');
+				this.searchButtonElement.title = 'list meals';
 				buttonGroupElement.appendChild(this.searchButtonElement);
 				this.searchButtonElement.addEventListener('click', () => {
 					this.onSearch({[this.searchQueryFieldName]: this.dataObj[this.identifierFieldName] });
@@ -72,6 +73,7 @@ class ItemBlock {
 			}
 			if(this.availableActions.includes('expand')) {
 				this.expandButtonElement = interactiveIcon('assets/circle-info-solid.svg');
+				this.expandButtonElement.title = 'more about this item';
 				buttonGroupElement.appendChild(this.expandButtonElement);
 				this.searchButtonElement.addEventListener('click', this.expandL2);
 			}
