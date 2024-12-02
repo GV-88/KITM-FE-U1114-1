@@ -50,7 +50,7 @@ export class IngredientBasic extends MealDBItem {
 	}
 	//works with spaces in file name
 	getImageUrl() { return `https://www.themealdb.com/images/ingredients/${encodeURIComponent(this.title)}.png`; }
-	getThumbnailUrl() { return Array.from(this.getImageUrl()).splice(-4, 0, '-Small').join(''); }
+	getThumbnailUrl() { return Array.from(this.getImageUrl()).toSpliced(-4, 0, '-Small').join(''); }
 }
 
 export class Ingredient extends IngredientBasic {
@@ -69,7 +69,7 @@ export class CategoryBasic extends MealDBItem {
 		super(title, id);
 	}
 	getImageUrl() { return this?.strCategoryThumb ?? `https://www.themealdb.com/images/category/${encodeURIComponent(this.title)}.png`; }
-	getThumbnailUrl() { return this.getImageUrl; }
+	getThumbnailUrl() { return this.getImageUrl(); }
 }
 
 export class Category extends CategoryBasic {
@@ -104,16 +104,21 @@ export class MealsApi {
 		return MealsApi.parseMealRecipes(data?.meals);
 	};
 
-	static async FilterMeals(query) {
+	static async filterMeals(query) {
 		const data = await AjaxService.get('filter', query);
 		return MealsApi.parseMealPreviews(data?.meals);
+	};
+
+	static async randomMeal() {
+		const data = await AjaxService.get('random');
+		return MealsApi.parseMealRecipes(data?.meals);
 	};
 
 	static async getAllIngredients() {
 		const data = await AjaxService.get('list', {ingredient: 'list'});
 		let ingredients = [];
 		if(data?.meals) {
-			ingredients = MealsApi.parseIngredients(data?.meals);
+			ingredients = MealsApi.parseIngredients(data.meals.slice(0,20)); //TEMPORARY LIMIT!!!
 			Storage.cacheMealIngredientNames(ingredients.map(i => i?.title));
 		}
 		return ingredients;

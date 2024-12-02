@@ -14,11 +14,14 @@
   &__list-header {
     display: flex;
   }
-  .items-list {
+  .items-list ul {
     list-style: none;
     margin: 0;
     padding-left: 1em;
     column-count: auto;
     column-width: 16em;
+    li.expanded {
+      column-span: all;
+    }
   }
 }

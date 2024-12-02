@@ -9,6 +9,8 @@ class ItemBlockMealArea extends ItemBlock {
 
 	identifierFieldName = 'title';
 
+	searchQueryFieldName = 'area';
+
 	specificClassName = 'item-block--area';
 
 	isSufficientData() {

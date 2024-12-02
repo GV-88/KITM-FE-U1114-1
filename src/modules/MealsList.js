@@ -10,10 +10,12 @@ class MealsList {
 		this.ingredientsLib = ingredientsLib; // should work as reference to object?
 		this.categoriesLib = categoriesLib;
 		this.areasLib = areasLib;
+		this.meals = [];
 		this.formObj = new SearchForm(
-			(result) => {
+			this,
+			async (result) => {
 				this.clear();
-				this.addMeals(result);
+				this.addMeals(await result);
 			}, 
 			this.ingredientsLib, 
 			this.categoriesLib, 
@@ -59,7 +61,12 @@ class MealsList {
 	}
 
 	addMeals(meals) {
-		console.log('addMeals', meals);
+		//TODO: 404 handling
+		// console.log('addMeals', meals);
+		for(const m of meals) {
+			this.meals.push(m);
+			this.listElement.appendChild(Utilities.createElementExt('span', [], {}, m?.title));
+		}
 	}
 
 	async clear() {

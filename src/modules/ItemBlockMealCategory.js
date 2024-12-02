@@ -1,3 +1,4 @@
+import Utilities from '../Utilities';
 import ItemBlock from './ItemBlock';
 
 class ItemBlockMealCategory extends ItemBlock {
@@ -9,12 +10,14 @@ class ItemBlockMealCategory extends ItemBlock {
 
 	identifierFieldName = 'title';
 
+	searchQueryFieldName = 'category';
+
 	specificClassName = 'item-block--category';
 
 	isSufficientData(level) {
 		switch (level) {
 			case 1:
-				return Boolean(this.dataObj?.getThumbnailUrl());
+				return Boolean(this.dataObj.getThumbnailUrl());
 			case 2:
 				return Boolean(this.dataObj?.strCategoryDescription);
 			default:
@@ -24,6 +27,16 @@ class ItemBlockMealCategory extends ItemBlock {
 
 	appendData(srcObj) {
 		this.dataObj = Object.assign(this.dataObj, srcObj);
+	}
+
+	async expandL2() {
+		await super.expandL2();
+		this.containerElement.appendChild(Utilities.createElementExt('p', ItemBlock.className + '__description', {}, this.dataObj.strCategoryDescription));
+	}
+
+	collapseL2() {
+		super.collapseL2();
+		Utilities.smoothRemove(this.containerElement, this.containerElement.querySelector('.' + ItemBlock.className + '__description'));
 	}
 
 }

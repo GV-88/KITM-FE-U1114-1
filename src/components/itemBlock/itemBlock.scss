@@ -1,3 +1,48 @@
+@use '../../scss/variables' as *;
+
 .item-block {
   display: flex;
+}
+.item-block--expanded-1 {
+  &.item-block--ingredient,
+  &.item-block--category {
+    gap: 4px;
+    .item-block {
+      &__button-group {
+        order: 1;
+      }
+      &__picture {
+        order: 2;
+        width: 50px;
+      }
+      &__title {
+        order: 3;
+      }
+    }
+  }
+}
+
+.item-block--expanded-2 {
+  &.item-block--ingredient,
+  &.item-block--category {
+    display: block;
+    background-color: getColor('bg1');
+    border-radius: 10px;
+    .item-block {
+      &__button-group {
+        display: inline;
+        float: left;
+      }
+      &__picture {
+        display: inline;
+        float: right;
+        width: auto;
+        max-width: 100%;
+        height: fit-content;
+      }
+      &__description {
+        padding: 1em;
+      }
+    }
+  }
 }

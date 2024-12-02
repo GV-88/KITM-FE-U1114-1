@@ -1,8 +1,9 @@
 import Utilities from '../../Utilities';
+import Storage from '../../modules/Storage';
 import {interactiveIcon} from '../common/common';
 import './SearchBlock.scss';
 
-const searchBlock = (label, type, queryFieldName, onSearch, listObj) => {
+const searchBlock = async (label, type, queryFieldName, onSearch, listObj) => {
 	const searchBlockElement = Utilities.createElementExt('div', 'search-block');
 	searchBlockElement.appendChild(
 		Utilities.createElementExt('div', 'search-block__label', {}, label));
@@ -18,6 +19,16 @@ const searchBlock = (label, type, queryFieldName, onSearch, listObj) => {
 			e.preventDefault();
 			onSearch({[queryFieldName]: inputElement.value});
 		});
+		
+		const searchHistory = await Storage.getMealSearches();
+		if(searchHistory?.length) {
+			const datalistElement = Utilities.createElementExt('datalist', [], {id:'datalist-' + queryFieldName});
+			for(let str of searchHistory) {
+				datalistElement.appendChild(Utilities.createElementExt('option', [], {value: str}));
+			}
+			searchBlockElement.appendChild(datalistElement);
+			inputElement.setAttribute('list', 'datalist-' + queryFieldName);
+		}
 	}
 	if(type === 'list') {
 		let isExpandedState = false;

@@ -9,12 +9,14 @@ class ItemBlockMealIngredient extends ItemBlock {
 
 	identifierFieldName = 'title';
 
+	searchQueryFieldName = 'ingredient';
+
 	specificClassName = 'item-block--ingredient';
 
 	isSufficientData(level) {
 		switch (level) {
 			case 1:
-				return Boolean(this.dataObj?.getThumbnailUrl());
+				return Boolean(this.dataObj.getThumbnailUrl());
 			case 2:
 				return Boolean(this.dataObj?.strDescription);
 			default:

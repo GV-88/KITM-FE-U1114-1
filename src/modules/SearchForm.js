@@ -1,51 +1,58 @@
 import searchBlock from '../components/searchBlock/searchBlock';
 import Utilities from '../Utilities';
+import { MealsApi } from './Api';
 import ItemBlockList from './ItemBlockList';
 import ItemBlockMealArea from './ItemBlockMealArea';
 import ItemBlockMealCategory from './ItemBlockMealCategory';
 import ItemBlockMealIngredient from './ItemBlockMealIngredient';
 
 class SearchForm {
-	constructor(resultsCallback, ingredientsLib, categoriesLib, areasLib) {		
+	constructor(resultsObj, resultsCallback, ingredientsLib, categoriesLib, areasLib) {		
 		this.isInitialised = false;
-		this.resultsCallback = resultsCallback;
+		this.resultsCallback = resultsCallback.bind(resultsObj);
 		this.ingredientsLib = ingredientsLib; // should work as reference to object?
 		this.categoriesLib = categoriesLib;
 		this.areasLib = areasLib;
-	}
-
-	async doSearch(query) {
-		console.log('doSearch', query);
-		//TODO: API calls here
-		this.resultsCallback();
 	}
 
 	async init() {
 		this.ingredientsList = new ItemBlockList(
 			(...args) => {return new ItemBlockMealIngredient(...args);},
 			this.ingredientsLib,
-			this.doSearch
+			this.doFilter.bind(this)
 		);
 		this.categoriesList = new ItemBlockList(
 			(...args) => {return new ItemBlockMealCategory(...args);},
 			this.categoriesLib,
-			this.doSearch
+			this.doFilter.bind(this)
 		);
 		this.areasList = new ItemBlockList(
 			(...args) => {return new ItemBlockMealArea(...args);},
 			this.areasLib,
-			this.doSearch
+			this.doFilter.bind(this)
 		);
 		this.formElement = Utilities.createElementExt('form', SearchForm.className, {workspace: ''});
 		this.formElement.append(
-			searchBlock('Search by name', 'text', 'searchstring', this.doSearch),
-			searchBlock('List by first letter', 'letter', 'firstLetter', this.doSearch),
-			searchBlock('List by category', 'list', 'category', null, this.categoriesList),
-			searchBlock('List by area', 'list', 'area', null, this.areasList),
-			searchBlock('List by ingredients', 'list', 'ingredient', null, this.ingredientsList),
-			searchBlock('Surprise me', 'random', null),
+			await searchBlock('Search by name', 'text', 'searchstring', this.doSearch.bind(this)),
+			await searchBlock('List by first letter', 'letter', 'firstLetter', this.doSearch.bind(this)),
+			await searchBlock('List by category', 'list', 'category', this.doFilter.bind(this), this.categoriesList),
+			await searchBlock('List by area', 'list', 'area', this.doFilter.bind(this), this.areasList),
+			await searchBlock('List by ingredients', 'list', 'ingredient', this.doFilter.bind(this), this.ingredientsList),
+			await searchBlock('Surprise me', 'random', this.doRandom.bind(this)),
 		);
 		this.isInitialised = true;
+	}
+
+	async doSearch(query) {
+		this.resultsCallback(MealsApi.searchMeals(query));
+	}
+
+	async doFilter(query) {
+		this.resultsCallback(MealsApi.filterMeals(query));
+	}
+
+	async doRandom() {
+		this.resultsCallback(MealsApi.randomMeal());
 	}
 
 	getElementRef() {

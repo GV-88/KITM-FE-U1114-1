@@ -19,7 +19,6 @@ class AjaxService {
 			const baseUrl =
 				envStatus === 'dev' ? 'http://localhost' : 'https://www.themealdb.com';
 			let url = new URL(baseUrl);
-			console.log(query);
 			
 			if (envStatus === 'dev') {
 				url.port = window.location.port;
