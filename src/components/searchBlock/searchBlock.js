@@ -85,7 +85,7 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj) => {
 		searchBlockElement.classList.add('search-block--list');
 		const listInputElement = Utilities.createElementExt('input', 'search-block__input', {type: 'text', name: queryFieldName});
 		const listHeaderElement = Utilities.createElementExt('div','search-block__list-header');
-		const toggleListButton = interactiveIcon('/assets/circle-chevron-right-solid.svg');
+		const toggleListButton = interactiveIcon('assets/circle-chevron-right-solid.svg');
 		const listLabelElement = Utilities.createElementExt('div', 'search-block__list-label', {}, 'show list');
 		const buttonElement = searchBlockElement.appendChild(
 			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit', name: queryFieldName}, 'List meals')

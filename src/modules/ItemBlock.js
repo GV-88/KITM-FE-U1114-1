@@ -31,15 +31,11 @@ class ItemBlock {
 	}
 
 	appendData(srcObj) {
-		// console.log(this.dataObj, srcObj);
 		this.dataObj = Object.assign(this.dataObj, srcObj);
 	}
 
 	async loadAndAppendData() {
-		// console.log('loadAndAppendData()', this.dataObj);
-		console.log('loadAndAppendData()', this.dataGetter);
 		const srcObj = await this.dataGetter(this.dataObj[this.identifierFieldName]);
-		console.log('srcObj', srcObj);		
 		if(srcObj) { this.appendData(srcObj); };
 	}
 
