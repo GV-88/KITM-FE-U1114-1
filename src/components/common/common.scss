@@ -36,7 +36,7 @@
 }
 
 .btn {
-  padding: 0.5em;
+  padding: 0.5em 1em;
   border: none;
   color: getColor('onPrimary');
   background-color: getColor(primary);
@@ -48,5 +48,10 @@
   &:active {
     background-color: color.scale($color: getColor('primary'), $lightness: -10%);
   }
+  &:disabled {
+    background-color: color.scale($color: getColor('primary'), $saturation: -100%);
+    opacity: 0.5;
+  }
   @include round();
+  @extend .butonFont1;
 }
