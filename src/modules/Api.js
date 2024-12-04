@@ -118,7 +118,7 @@ export class MealsApi {
 		const data = await AjaxService.get('list', {ingredient: 'list'});
 		let ingredients = [];
 		if(data?.meals) {
-			ingredients = MealsApi.parseIngredients(data.meals.slice(0,20)); //TEMPORARY LIMIT!!!
+			ingredients = MealsApi.parseIngredients(data.meals);
 			Storage.cacheMealIngredientNames(ingredients.map(i => i?.title));
 		}
 		return ingredients;

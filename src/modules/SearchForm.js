@@ -18,16 +18,19 @@ class SearchForm {
 	async init() {
 		this.ingredientsList = new ItemBlockList(
 			(...args) => {return new ItemBlockMealIngredient(...args);},
+			20,
 			this.ingredientsLib,
 			this.doFilter.bind(this)
 		);
 		this.categoriesList = new ItemBlockList(
 			(...args) => {return new ItemBlockMealCategory(...args);},
+			null,
 			this.categoriesLib,
 			this.doFilter.bind(this)
 		);
 		this.areasList = new ItemBlockList(
 			(...args) => {return new ItemBlockMealArea(...args);},
+			null,
 			this.areasLib,
 			this.doFilter.bind(this)
 		);
@@ -38,7 +41,7 @@ class SearchForm {
 			await searchBlock('List by category', 'list', 'category', this.doFilter.bind(this), this.categoriesList),
 			await searchBlock('List by area', 'list', 'area', this.doFilter.bind(this), this.areasList),
 			await searchBlock('List by ingredients', 'list', 'ingredient', this.doFilter.bind(this), this.ingredientsList),
-			await searchBlock('Surprise me', 'random', this.doRandom.bind(this)),
+			await searchBlock('Surprise me', 'random', null, this.doRandom.bind(this)),
 		);
 		this.isInitialised = true;
 	}

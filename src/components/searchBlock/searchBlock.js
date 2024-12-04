@@ -13,7 +13,7 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj) => {
 			Utilities.createElementExt('input', 'search-block__input', {type: 'text', name: queryFieldName})
 		);
 		const buttonElement = searchBlockElement.appendChild(
-			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit', name: queryFieldName}, 'Search')
+			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit'}, 'Search')
 		);
 		buttonElement.addEventListener('click', (e) => {
 			e.preventDefault();
@@ -33,8 +33,12 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj) => {
 	if(type === 'list') {
 		let isExpandedState = false;
 
+		const inputHandler = (e) => {
+			Utilities.setDisabledAttribute(buttonElement, e.target.value.trim() !== '');
+		};
+
 		const fillInputOptions = async () => {
-			if(listInputElement?.list) {
+			if(inputElement?.list) {
 				return; //do this only once
 			}
 			if(!listObj.isInitialised) {
@@ -46,7 +50,7 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj) => {
 					datalistElement.appendChild(Utilities.createElementExt('option', [], {value: str}));
 				}
 				searchBlockElement.appendChild(datalistElement);
-				listInputElement.setAttribute('list', 'datalist-' + queryFieldName);
+				inputElement.setAttribute('list', 'datalist-' + queryFieldName);
 			}
 		};
 
@@ -83,23 +87,25 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj) => {
 		};
 
 		searchBlockElement.classList.add('search-block--list');
-		const listInputElement = Utilities.createElementExt('input', 'search-block__input', {type: 'text', name: queryFieldName});
+		const inputElement = Utilities.createElementExt('input', 'search-block__input', {type: 'text', name: queryFieldName});
 		const listHeaderElement = Utilities.createElementExt('div','search-block__list-header');
 		const toggleListButton = interactiveIcon('assets/circle-chevron-right-solid.svg');
 		const listLabelElement = Utilities.createElementExt('div', 'search-block__list-label', {}, 'show list');
 		const buttonElement = searchBlockElement.appendChild(
-			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit', name: queryFieldName}, 'List meals')
+			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit', disabled: ''}, 'List meals')
 		);
 		listHeaderElement.append( toggleListButton, listLabelElement);
-		searchBlockElement.append(listInputElement, buttonElement, listHeaderElement);
+		searchBlockElement.append(inputElement, buttonElement, listHeaderElement);
 		fillInputOptions();
 		toggleListButton.addEventListener('click', toggleList);
 		listLabelElement.addEventListener('click', toggleList);
 
+		inputElement.addEventListener('input', inputHandler);
 		buttonElement.addEventListener('click', (e) => {
 			e.preventDefault();
-			onSearch({[queryFieldName]: listInputElement.value});
+			onSearch({[queryFieldName]: inputElement.value});
 		});
+
 	}
 	if(type === 'letter') {
 		searchBlockElement.classList.add('search-block--letter');
@@ -119,7 +125,7 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj) => {
 	if(type === 'random') {
 		searchBlockElement.classList.add('search-block--random');
 		const buttonElement = searchBlockElement.appendChild(
-			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit', name: queryFieldName}, 'Random')
+			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit'}, 'Random')
 		);
 		buttonElement.addEventListener('click', (e) => {
 			e.preventDefault();

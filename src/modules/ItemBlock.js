@@ -4,7 +4,8 @@ import Utilities from '../Utilities';
 class ItemBlock {
 	constructor(initialData, dataGetter, onSearch, onExpanded) {
 		this.isInitialised = false;
-		this.currentExpandLevel = 0;
+		this.isPreview = 0;
+		this.isExpanded = 0;
 		this.dataObj = initialData;
 		this.dataGetter = dataGetter;
 		this.onSearch = onSearch;
@@ -39,7 +40,22 @@ class ItemBlock {
 		if(srcObj) { this.appendData(srcObj); };
 	}
 
-	addPictureElement(source, overwrite) {
+	async init(expandLevel) {
+		this.containerElement = Utilities.createElementExt('div', ItemBlock.className, {'data-title': this.dataObj.title});
+		await this.addInitialContent();
+		if (this.specificClassName) {
+			this.containerElement.classList.add(this.specificClassName);
+		}
+		if(expandLevel === 1) {
+			await this.expandL1();
+		}
+		if(expandLevel === 2) {
+			await this.expandL2();
+		}
+		this.isInitialised = true;
+	}
+
+	addPictureElement(parentElement, source, overwrite) {
 		const imgSrc = source;
 		if(this.pictureElement) {
 			if(!(this.pictureElement?.src) || overwrite) {
@@ -48,21 +64,16 @@ class ItemBlock {
 		} else {
 			this.pictureElement = Utilities.createElementExt('img', 'item-block__picture', {src: imgSrc});
 		}
-		if(!(this.pictureElement.isConnected)) {
-			this.containerElement.prepend(this.pictureElement);
+		if(!(this.pictureElement.isConnected) || this.pictureElement.parentElement !== parentElement) {
+			parentElement.prepend(this.pictureElement);
 		}
 	}
 
-	removePictureElement() {
-		Utilities.smoothRemove(this.containerElement, this.pictureElement);
+	removePictureElement(parentElement) {
+		Utilities.smoothRemove(parentElement, this.pictureElement);
 	}
 
-	async init(expandLevel) {
-		if(expandLevel) {
-			this.currentExpandLevel = expandLevel;
-		}
-
-		this.containerElement = Utilities.createElementExt('div', ItemBlock.className, {'data-title': this.dataObj.title});
+	async addInitialContent() {
 		if(this.availableActions?.length ?? 0 > 0) {
 			const buttonGroupElement = Utilities.createElementExt('div', 'item-block__button-group');
 			if(this.availableActions.includes('search')) {
@@ -82,77 +93,74 @@ class ItemBlock {
 			this.containerElement.appendChild(buttonGroupElement);
 		}
 		const titleElement = Utilities.createElementExt('div', 'item-block__title', {}, this.dataObj.title);
-		// this.contentElement = Utilities.createElementExt('div', 'item-block__content');
 		this.containerElement.append(titleElement);
-		if (this.specificClassName) {
-			this.containerElement.classList.add(this.specificClassName);
-		}
-
-		switch (this.currentExpandLevel) {
-			case 1:
-				this.expandL1();
-				break;
-			case 2:
-				this.expandL2();
-				break;
-			default:
-				break;
-		}
-
-		this.isInitialised = true;
 	}
 
-	// renderL1content
+	async addPreviewContent() {
+		this.addPictureElement(this.containerElement, this.dataObj.getThumbnailUrl());
+	}
+
+	async removePreviewContent() {
+		if(!(this.isExpanded)) {
+			this.removePictureElement(this.containerElement);
+		}
+	}
+
+	async addFullContent() {
+		this.addPictureElement(this.containerElement, this.dataObj.getImageUrl(), true);
+	}
+
+	async removeFullContent() {
+		if(!this.isPreview) {
+			this.removePictureElement(this.containerElement);
+		}
+	}
 
 	async expandL1() {
 		if(!this.isSufficientData(1)) {
 			await this.loadAndAppendData();
 		}
-		this.currentExpandLevel = Math.max(this.currentExpandLevel, 1);
-		this.containerElement.classList.add(ItemBlock.className + '--expanded-1');
-		this.containerElement.classList.add(ItemBlock.className + '--preview'); //?
-		this.addPictureElement(this.dataObj.getThumbnailUrl());
+		await this.addPreviewContent();
+		this.containerElement.classList.add(ItemBlock.className + '--preview');
+		this.isPreview = true;
 	}
 
 	async expandL2() {
 		if(!this.isSufficientData(2)) {
 			await this.loadAndAppendData();
 		}
-		this.currentExpandLevel = 2;
-		this.containerElement.classList.add(ItemBlock.className + '--expanded-2');
-		this.expandButtonElement.querySelector('img').src = 'assets/circle-chevron-down-solid.svg';
-		this.expandButtonElement.addEventListener('click', this.collapseL2.bind(this), {once: true});
-		this.addPictureElement(this.dataObj.getImageUrl(), true);
+		await this.addFullContent();
+		this.containerElement.classList.add(ItemBlock.className + '--expanded');
+		if(this.expandButtonElement) {
+			this.expandButtonElement.querySelector('img').src = 'assets/circle-chevron-down-solid.svg';
+			this.expandButtonElement.addEventListener('click', this.collapseL2.bind(this), {once: true});
+		}
 		const parentElement = this.containerElement.closest('li');
 		if(parentElement) {
 			parentElement.classList.add('expanded');
 		}
+		this.isExpanded = true;
 		this.onExpanded();
 	}
 
-	collapseL1() {
-		this.containerElement.classList.remove(ItemBlock.className + '--expanded-1');
-		this.containerElement.classList.remove(ItemBlock.className + '--preview'); //?
-		if(!(this.containerElement.classList.contains(ItemBlock.className + '--expanded-2'))) {
-			this.currentExpandLevel = 0;
-			this.removePictureElement();
-		}
+	async collapseL1() {
+		await this.removePreviewContent();
+		this.containerElement.classList.remove(ItemBlock.className + '--preview');
+		this.isPreview = false;
 	}
 
-	collapseL2() {
-		this.containerElement.classList.remove(ItemBlock.className + '--expanded-2');
-		this.expandButtonElement.querySelector('img').src = 'assets/circle-info-solid.svg';
-		this.expandButtonElement.addEventListener('click', this.expandL2.bind(this), {once: true});
-		if(this.containerElement.classList.contains(ItemBlock.className + '--expanded-1')) {
-			this.currentExpandLevel = 1;
-		} else {
-			this.currentExpandLevel = 0;
-			this.removePictureElement();
+	async collapseL2() {
+		await this.removeFullContent();
+		this.containerElement.classList.remove(ItemBlock.className + '--expanded');
+		if(this.expandButtonElement) {
+			this.expandButtonElement.querySelector('img').src = 'assets/circle-info-solid.svg';
+			this.expandButtonElement.addEventListener('click', this.expandL2.bind(this), {once: true});
 		}
 		const parentElement = this.containerElement.closest('li');
 		if(parentElement) {
 			parentElement.classList.remove('expanded');
 		}
+		this.isExpanded = false;
 	}
 
 	getElementRef() {

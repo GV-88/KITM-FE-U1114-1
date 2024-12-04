@@ -1,3 +1,4 @@
+import Utilities from '../Utilities';
 import ItemBlock from './ItemBlock';
 
 class ItemBlockMealIngredient extends ItemBlock {
@@ -24,8 +25,18 @@ class ItemBlockMealIngredient extends ItemBlock {
 		}
 	}
 
-	appendData(srcObj) {
-		this.dataObj = Object.assign(this.dataObj, srcObj);
+	async addFullContent() {
+		await super.addFullContent();
+		this.containerElement.append(
+			Utilities.createElementExt('div', ItemBlock.className + '__type', {}, this.dataObj.strType),
+			Utilities.createElementExt('p', ItemBlock.className + '__description', {}, this.dataObj.strDescription)
+		);
+	}
+
+	removeFullContent() {
+		super.removeFullContent();
+		Utilities.smoothRemove(this.containerElement, this.containerElement.querySelector('.' + ItemBlock.className + '__description'));
+		Utilities.smoothRemove(this.containerElement, this.containerElement.querySelector('.' + ItemBlock.className + '__type'));
 	}
 
 }

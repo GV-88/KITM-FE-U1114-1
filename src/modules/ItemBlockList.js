@@ -1,17 +1,19 @@
 import Utilities from '../Utilities';
 
 class ItemBlockList {
-	constructor(itemBlockConstructor, sourceRef, onSearch, overwriteList) {
+	constructor(itemBlockConstructor, visualLimit, sourceRef, onSearch, overwriteList) {
 		this.isInitialised = false;
 		this.isThumbnailDisplay = false;
 		this.itemBlockConstructor = itemBlockConstructor;
+		this.visualLimit = visualLimit;
 		this.source = sourceRef;
 		this.onSearchFn = onSearch;
 		this.namesList = overwriteList ?? [];
 		this.itemBlocks = [];
 	}
 
-	async fillContent() {
+	async fillContent(limit) {
+		let count = 0;
 		for(let name of this.namesList) {
 			const itemBlock = this.itemBlockConstructor(
 				this.source.basicItemConstructor(name),
@@ -20,13 +22,30 @@ class ItemBlockList {
 					this.onSearchFn(q);
 				},
 				() => {
-					console.log('onExpanded', name);
+					console.log('onExpanded', name); //TODO: accordion behavior
 				},
 			);
 			this.itemBlocks.push(itemBlock);
 			await itemBlock.init(this.isThumbnailDisplay ? 1 : 0);
 			this.listElement.appendChild(Utilities.createElementExt('li'))
 				.appendChild(itemBlock.getElementRef());
+			count++;
+			if(limit && this.visualLimit && count >= this.visualLimit) {
+				if(this.showAllElement) {
+					this.showAllElement.classList.remove('hidden');
+				} else {
+					this.showAllElement = Utilities.createElementExt('a', this.className+'__show-all', {}, 'show all');
+					this.containerElement.appendChild(this.showAllElement);
+					this.showAllElement.addEventListener('click', (e) => {
+						e.preventDefault();
+						Utilities.clearChildren(this.listElement);
+						this.itemBlocks = [];
+						this.fillContent();
+						e.target.classList.add('hidden');
+					});
+				}
+				break;
+			}
 		}
 	}
 
@@ -38,7 +57,7 @@ class ItemBlockList {
 		if(!this.namesList.length) {
 			this.namesList = await this.source.getList(cacheOnly);
 		}
-		await this.fillContent();
+		await this.fillContent(true);
 		this.isInitialised = true;
 	}
 
@@ -58,10 +77,11 @@ class ItemBlockList {
 		
 		Utilities.clearChildren(this.listElement);
 		this.itemBlocks = [];
-		await this.fillContent();
+		await this.fillContent(true);
 	}
 
 	async toggleThumbnails(condition) {
+		this.isThumbnailDisplay = condition;
 		for(const ib of this.itemBlocks) {
 			if(condition) {
 				ib.expandL1();

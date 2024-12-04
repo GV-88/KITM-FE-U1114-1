@@ -2,6 +2,8 @@
 // it will have its own interlinked search form
 
 import Utilities from '../Utilities';
+import { MealsApi } from './Api';
+import ItemBlockMeal from './ItemBlockMeal';
 import SearchForm from './SearchForm';
 
 class MealsList {
@@ -11,6 +13,7 @@ class MealsList {
 		this.categoriesLib = categoriesLib;
 		this.areasLib = areasLib;
 		this.meals = [];
+		this.itemBlocks = [];
 		this.formObj = new SearchForm(
 			this,
 			async (result) => {
@@ -60,12 +63,26 @@ class MealsList {
 		this.formObj.prefillTxtSearch(val);
 	}
 
-	addMeals(meals) {
+	async addMeals(meals) {
 		//TODO: 404 handling
 		// console.log('addMeals', meals);
 		for(const m of meals) {
 			this.meals.push(m);
-			this.listElement.appendChild(Utilities.createElementExt('span', [], {}, m?.title));
+			// this.listElement.appendChild(Utilities.createElementExt('span', [], {}, m?.title));
+			const itemBlock = new ItemBlockMeal(
+				m,
+				async () => {
+					const data = await MealsApi.searchMeals({id: m.id});
+					return data[0]; //TODO: error handling
+				},
+				null,
+				() => {
+					console.log('onExpanded', name); //TODO: accordion behavior
+				},
+			);
+			this.itemBlocks.push(itemBlock);
+			await itemBlock.init(1);
+			this.listElement.appendChild(itemBlock.getElementRef());
 		}
 	}
 

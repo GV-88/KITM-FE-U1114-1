@@ -25,17 +25,13 @@ class ItemBlockMealCategory extends ItemBlock {
 		}
 	}
 
-	appendData(srcObj) {
-		this.dataObj = Object.assign(this.dataObj, srcObj);
-	}
-
-	async expandL2() {
-		await super.expandL2();
+	async addFullContent() {
+		await super.addFullContent();
 		this.containerElement.appendChild(Utilities.createElementExt('p', ItemBlock.className + '__description', {}, this.dataObj.strCategoryDescription));
 	}
 
-	collapseL2() {
-		super.collapseL2();
+	removeFullContent() {
+		super.removeFullContent();
 		Utilities.smoothRemove(this.containerElement, this.containerElement.querySelector('.' + ItemBlock.className + '__description'));
 	}
 

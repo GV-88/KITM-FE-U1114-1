@@ -3,7 +3,7 @@
 .item-block {
   display: flex;
 }
-.item-block--expanded-1 {
+.item-block--preview {
   &.item-block--ingredient,
   &.item-block--category {
     gap: 4px;
@@ -22,7 +22,7 @@
   }
 }
 
-.item-block--expanded-2 {
+.item-block--expanded {
   &.item-block--ingredient,
   &.item-block--category {
     display: block;
