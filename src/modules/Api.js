@@ -34,6 +34,7 @@ export class MealRecipe extends Meal {
 			strArea: this.strArea,
 			strInstructions: this.strInstructions,
 			strYoutube: this.strYoutube,
+			strSource: this.strSource,
 		} = parsedJsonObject);
 		this.ingredients = [];
 		for(let i = 1; i <= 20; i++) {
@@ -101,17 +102,26 @@ export class MealsApi {
 		let endpoint = query?.id ? 'lookup' : 'search';
 		if(query?.searchstring) { Storage.addToMealSearches(query.searchstring); }
 		const data = await AjaxService.get(endpoint, query);
-		return MealsApi.parseMealRecipes(data?.meals);
+		if(data?.Error) {
+			throw new Error(data.Error);
+		}
+		return data.meals === null ? null : MealsApi.parseMealRecipes(data?.meals);
 	};
 
 	static async filterMeals(query) {
 		const data = await AjaxService.get('filter', query);
-		return MealsApi.parseMealPreviews(data?.meals);
+		if(data?.Error) {
+			throw new Error(data.Error);
+		}
+		return data.meals === null ? null : MealsApi.parseMealPreviews(data?.meals);
 	};
 
 	static async randomMeal() {
 		const data = await AjaxService.get('random');
-		return MealsApi.parseMealRecipes(data?.meals);
+		if(data?.Error) {
+			throw new Error(data.Error);
+		}
+		return data.meals === null ? null : MealsApi.parseMealRecipes(data?.meals);
 	};
 
 	static async getAllIngredients() {

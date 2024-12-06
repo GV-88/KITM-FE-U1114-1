@@ -12,6 +12,7 @@ const searchbar = (onSimpleSearch, onAdvancedSearch) => {
 	inputWrapperElement.append(inputElement, iconElement);
 	allWrapperElement.append(inputWrapperElement, buttonElement);
 	containerElement.append(allWrapperElement);
+	containerElement.classList.add('searchbar--link-to-advanced');
 	inputElement.addEventListener('focus', () => {
 		containerElement.classList.add('searchbar--expanded');
 	});
@@ -24,10 +25,22 @@ const searchbar = (onSimpleSearch, onAdvancedSearch) => {
 		if (inputElement.value === '') {
 			inputElement.focus();
 		} else {
+			containerElement.classList.remove('searchbar--expanded');
 			onSimpleSearch(inputElement.value);
 		}
 	});
-	buttonElement.addEventListener('click', () => {onAdvancedSearch(inputElement.value);});
+	inputElement.addEventListener('keydown', (e) => {
+		if(e.key === 'Enter' && inputElement.value.trim() != '') {
+			e.stopPropagation();
+			containerElement.classList.remove('searchbar--expanded');
+			onSimpleSearch(inputElement.value);
+		}
+	});
+	buttonElement.addEventListener('click', () => {
+		containerElement.classList.remove('searchbar--expanded');
+		onAdvancedSearch(inputElement.value);
+	});
+
 	return containerElement;
 };
 

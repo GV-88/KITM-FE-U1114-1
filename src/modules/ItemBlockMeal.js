@@ -3,8 +3,10 @@ import Utilities from '../Utilities';
 import ItemBlock from './ItemBlock';
 
 class ItemBlockMeal extends ItemBlock {
-	constructor(initialData, dataGetter, onSearch, onExpanded) {
+	constructor(initialData, dataGetter, onSearch, onExpanded, ingredientsLib, categoriesLib) {
 		super(initialData, dataGetter, onSearch, onExpanded);
+		this.ingredientsLib = ingredientsLib;
+		this.categoriesLib = categoriesLib;
 	}
 
 	availableActions = ['expand'];
@@ -52,8 +54,7 @@ class ItemBlockMeal extends ItemBlock {
 
 	async addFullContent() {
 		Utilities.clearChildren(this.containerElement);
-		this.containerElement.appendChild(await mealRecipe(this.dataObj));
-		// this.addPictureElement(this.containerElement, this.dataObj.getImageUrl(), true);
+		this.containerElement.appendChild(await mealRecipe(this.dataObj, this.ingredientsLib, this.categoriesLib, this.onSearch));
 	}
 
 	async removeFullContent() {

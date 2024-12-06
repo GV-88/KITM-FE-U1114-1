@@ -1,40 +1,49 @@
 import Utilities from '../../Utilities';
-import Storage from '../../modules/Storage';
 import {interactiveIcon} from '../common/common';
 import './SearchBlock.scss';
 
-const searchBlock = async (label, type, queryFieldName, onSearch, listObj) => {
+const searchBlock = async (label, type, queryFieldName, onSearch, listObj, datalistId) => {
 	const searchBlockElement = Utilities.createElementExt('div', 'search-block');
 	searchBlockElement.appendChild(
 		Utilities.createElementExt('div', 'search-block__label', {}, label));
 	if(type === 'text') {
+
+		const inputHandler = (e) => {
+			Utilities.setDisabledAttribute(buttonElement, e.target.value.trim() !== '');
+		};
+
 		searchBlockElement.classList.add('search-block--text');
 		const inputElement = searchBlockElement.appendChild(
 			Utilities.createElementExt('input', 'search-block__input', {type: 'text', name: queryFieldName})
 		);
 		const buttonElement = searchBlockElement.appendChild(
-			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit'}, 'Search')
+			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit', disabled: ''}, 'Search')
 		);
+		inputElement.addEventListener('input', inputHandler);
+		inputElement.setAttribute('list', datalistId);
 		buttonElement.addEventListener('click', (e) => {
 			e.preventDefault();
 			onSearch({[queryFieldName]: inputElement.value});
 		});
-		
-		const searchHistory = await Storage.getMealSearches();
-		if(searchHistory?.length) {
-			const datalistElement = Utilities.createElementExt('datalist', [], {id:'datalist-' + queryFieldName});
-			for(let str of searchHistory) {
-				datalistElement.appendChild(Utilities.createElementExt('option', [], {value: str}));
-			}
-			searchBlockElement.appendChild(datalistElement);
-			inputElement.setAttribute('list', 'datalist-' + queryFieldName);
-		}
+
+		// const searchHistory = await Storage.getMealSearches();
+		// if(searchHistory?.length) {
+		// 	const datalistElement = Utilities.createElementExt('datalist', [], {id:'datalist-' + queryFieldName});
+		// 	for(let str of searchHistory) {
+		// 		datalistElement.appendChild(Utilities.createElementExt('option', [], {value: str}));
+		// 	}
+		// 	searchBlockElement.appendChild(datalistElement);
+		// 	inputElement.setAttribute('list', 'datalist-' + queryFieldName);
+		// }
 	}
 	if(type === 'list') {
 		let isExpandedState = false;
 
 		const inputHandler = (e) => {
 			Utilities.setDisabledAttribute(buttonElement, e.target.value.trim() !== '');
+			if(isExpandedState) {
+				listObj.moveItemsToTop(e.target.value);
+			}
 		};
 
 		const fillInputOptions = async () => {

@@ -63,9 +63,22 @@ class Utilities {
    * @param {HTMLElement} element
    */
 	static scrollIntoViewIfNeeded(element) {
+		if(!element) {
+			return;
+		}
 		const viewport = window.visualViewport;
-		if (element.getBoundingClientRect()['bottom'] > viewport.offsetTop + viewport.height) {
-			element.scrollIntoView(false);
+		const rect = element.getBoundingClientRect();
+		if (rect.height <= viewport.height) {
+			if(rect.top < viewport.offsetTop) {
+				element.scrollIntoView(true);
+			} else if(rect.bottom > viewport.offsetTop + viewport.height) {
+				element.scrollIntoView(false);
+			}
+		} else {
+			const visualCenter = viewport.offsetTop + viewport.height * 0.5;
+			if(rect.top > visualCenter || rect.bottom < visualCenter ) {
+				element.scrollIntoView(true);
+			}
 		}
 	}
 

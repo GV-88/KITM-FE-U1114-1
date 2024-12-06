@@ -10,25 +10,68 @@ class ItemBlockList {
 		this.onSearchFn = onSearch;
 		this.namesList = overwriteList ?? [];
 		this.itemBlocks = [];
+		this.sortedNamesList = [];
+	}
+
+	createItemBlock(name) {
+		return this.itemBlockConstructor(
+			this.source.basicItemConstructor(name),
+			this.source.getItem.bind(this.source),
+			(q) => {
+				this.onSearchFn(q);
+			},
+			((current) => {
+				// accordion behavior
+				for(const itemBlock of this.itemBlocks) {
+					if(itemBlock !== current) {
+						itemBlock.collapseL2();
+					}
+				}
+			}).bind(this),
+		);
+	}
+
+	async addItemBlock(name, toTop) {
+		let itemBlock = this.itemBlocks.find(block => block.getIdentifier() === name);
+		if(!itemBlock) {
+			itemBlock = this.createItemBlock(name);
+			this.itemBlocks.push(itemBlock);
+			await itemBlock.init(this.isThumbnailDisplay ? 1 : 0);
+		}
+		const itemBlockElement = itemBlock.getElementRef();
+		let listItemElement = itemBlockElement.closest('li');
+		if(listItemElement) {
+			if(!toTop && listItemElement.parentElement === this.listElement) {
+				return itemBlockElement;
+			}
+		} else {
+			listItemElement = Utilities.createElementExt('li', [], {'data-title': Utilities.cleanString(name)});
+			listItemElement.appendChild(itemBlockElement);
+			if(!toTop) {
+				this.listElement.append(listItemElement);
+			}
+		}
+		if(toTop) {
+			this.listElement.prepend(listItemElement);
+		}
+		return itemBlock;
+	}
+
+	async removeItemsFromBottom(num) {
+		if(num <= 0 || !this.isInitialised) {
+			return;
+		}
+		const listItems = Array.from(this.listElement.children);
+		for(let i = 1; i <= num; i++) {
+			Utilities.smoothRemove(this.listElement, listItems.at(i * -1));
+			//TODO: remove from this.itemBlocks as well!!! (or maybe not necessary?)
+		}
 	}
 
 	async fillContent(limit) {
 		let count = 0;
 		for(let name of this.namesList) {
-			const itemBlock = this.itemBlockConstructor(
-				this.source.basicItemConstructor(name),
-				this.source.getItem.bind(this.source),
-				(q) => {
-					this.onSearchFn(q);
-				},
-				() => {
-					console.log('onExpanded', name); //TODO: accordion behavior
-				},
-			);
-			this.itemBlocks.push(itemBlock);
-			await itemBlock.init(this.isThumbnailDisplay ? 1 : 0);
-			this.listElement.appendChild(Utilities.createElementExt('li'))
-				.appendChild(itemBlock.getElementRef());
+			await this.addItemBlock(name, false);
 			count++;
 			if(limit && this.visualLimit && count >= this.visualLimit) {
 				if(this.showAllElement) {
@@ -56,6 +99,7 @@ class ItemBlockList {
 		this.containerElement.appendChild(this.listElement);
 		if(!this.namesList.length) {
 			this.namesList = await this.source.getList(cacheOnly);
+			this.sortedNamesList = this.namesList.toSorted().toReversed();
 		}
 		await this.fillContent(true);
 		this.isInitialised = true;
@@ -73,6 +117,7 @@ class ItemBlockList {
 
 	async updateList() {
 		this.namesList = await this.source.getList();
+		this.sortedNamesList = this.namesList.toSorted().toReversed();
 		// console.log('updateList()', this.namesList);
 		
 		Utilities.clearChildren(this.listElement);
@@ -88,6 +133,22 @@ class ItemBlockList {
 			} else {
 				ib.collapseL1();
 			}
+		}
+	}
+
+	async moveItemsToTop(searchstring) {
+		if ((searchstring ?? '').trim() === '' || !this.listElement.isConnected) {
+			return;
+		}
+		let anyMatch = false;
+		for(let name of this.sortedNamesList) {
+			if(name.toLowerCase().includes(searchstring.toLowerCase())) {
+				anyMatch = true;
+				await this.addItemBlock(name, true);
+			}
+		}
+		if(anyMatch && this.visualLimit && this.listElement.children.length > this.visualLimit) {
+			this.removeItemsFromBottom(this.listElement.children.length - this.visualLimit);
 		}
 	}
 

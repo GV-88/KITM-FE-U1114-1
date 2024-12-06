@@ -31,9 +31,12 @@ class AjaxService {
 				url.searchParams.append(AjaxService.queryParamsTranslation[key], query[key]);
 			}
 
-			console.log(url.toString());
+			console.log(Date.now(), url.toString());
 
 			const response = await fetch(url);
+			if(!response.ok && !response.redirected) {
+				throw new Error(response?.statusText || 'not ok');
+			}
 			if (
 				response?.headers &&
 				(response.headers.get('Content-Type') ?? '')
@@ -45,7 +48,7 @@ class AjaxService {
 				throw new Error('unexpected content type');
 			}
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 			return { Response: false, Error: error };
 		}
 	}

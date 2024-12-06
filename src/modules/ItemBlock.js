@@ -20,6 +20,10 @@ class ItemBlock {
 
 	specificClassName = undefined;
 
+	getIdentifier() {
+		return this.dataObj?.title;
+	}
+
 	isSufficientData(level) {
 		switch (level) {
 			case 1:
@@ -41,7 +45,7 @@ class ItemBlock {
 	}
 
 	async init(expandLevel) {
-		this.containerElement = Utilities.createElementExt('div', ItemBlock.className, {'data-title': this.dataObj.title});
+		this.containerElement = Utilities.createElementExt('div', ItemBlock.className, {'data-title': Utilities.cleanString(this.dataObj.title)});
 		await this.addInitialContent();
 		if (this.specificClassName) {
 			this.containerElement.classList.add(this.specificClassName);
@@ -65,7 +69,7 @@ class ItemBlock {
 			this.pictureElement = Utilities.createElementExt('img', 'item-block__picture', {src: imgSrc});
 		}
 		if(!(this.pictureElement.isConnected) || this.pictureElement.parentElement !== parentElement) {
-			parentElement.prepend(this.pictureElement);
+			parentElement.appendChild(this.pictureElement);
 		}
 	}
 
@@ -81,7 +85,9 @@ class ItemBlock {
 				this.searchButtonElement.title = 'list meals';
 				buttonGroupElement.appendChild(this.searchButtonElement);
 				this.searchButtonElement.addEventListener('click', () => {
-					this.onSearch({[this.searchQueryFieldName]: this.dataObj[this.identifierFieldName] });
+					if(typeof this.onSearch === 'function') {
+						this.onSearch({[this.searchQueryFieldName]: this.dataObj[this.identifierFieldName] });
+					}
 				});
 			}
 			if(this.availableActions.includes('expand')) {
@@ -92,8 +98,8 @@ class ItemBlock {
 			}
 			this.containerElement.appendChild(buttonGroupElement);
 		}
-		const titleElement = Utilities.createElementExt('div', 'item-block__title', {}, this.dataObj.title);
-		this.containerElement.append(titleElement);
+		this.titleElement = Utilities.createElementExt('div', 'item-block__title', {}, this.dataObj.title);
+		this.containerElement.append(this.titleElement);
 	}
 
 	async addPreviewContent() {
@@ -120,14 +126,29 @@ class ItemBlock {
 		if(!this.isSufficientData(1)) {
 			await this.loadAndAppendData();
 		}
+		if(!this.isSufficientData(1)) {
+			console.log(`insufficient data for ${this.dataObj.title}`);
+			return;
+		}
 		await this.addPreviewContent();
 		this.containerElement.classList.add(ItemBlock.className + '--preview');
 		this.isPreview = true;
 	}
 
 	async expandL2() {
+		if(this.isExpanded) {
+			return;
+		}
 		if(!this.isSufficientData(2)) {
 			await this.loadAndAppendData();
+		}
+		if(!this.isSufficientData(2)) {
+			console.log(`insufficient data for ${this.dataObj.title}`);
+			// return;
+			/* very interesting case with ingredients:
+			when we don't have the description data with initial lazy load, this signals a need to request it;
+			but then if successful request proves there is no description data, then it's OK, we can still show what we have
+			*/
 		}
 		await this.addFullContent();
 		this.containerElement.classList.add(ItemBlock.className + '--expanded');
@@ -140,7 +161,12 @@ class ItemBlock {
 			parentElement.classList.add('expanded');
 		}
 		this.isExpanded = true;
-		this.onExpanded();
+		setTimeout(() => {
+			Utilities.scrollIntoViewIfNeeded(this.containerElement);
+		}, 250);
+		if(typeof this.onExpanded === 'function') {
+			this.onExpanded(this);
+		}
 	}
 
 	async collapseL1() {
@@ -150,6 +176,9 @@ class ItemBlock {
 	}
 
 	async collapseL2() {
+		if(!this.isExpanded) {
+			return;
+		}
 		await this.removeFullContent();
 		this.containerElement.classList.remove(ItemBlock.className + '--expanded');
 		if(this.expandButtonElement) {

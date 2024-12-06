@@ -56,3 +56,52 @@
     padding: 1em 2em;
   }
 }
+
+.about-section {
+  font-size: 20px; //on container for relative em
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-end;
+  padding-top: var(--pad);
+  padding-bottom: var(--pad);
+  background-color: getColor('bg2');
+  background-image: url('../../assets/about_img_1.png');
+  background-size: cover;
+  --pad: 8px;
+  @media (min-width: $sizeBreakpointSm) {
+    --pad: 16px;
+  }
+  @media (min-width: $sizeBreakpointMd) {
+    --pad: 32px;
+  }
+  @media (min-width: $sizeBreakpointLg) {
+    --pad: 48px;
+  }
+  @media (min-width: $sizeBreakpointXl) {
+    --pad: 64px;
+  }
+  &__card {
+    margin: 1em 1.5em 2.5em 1.5em;
+    width: fit-content;
+    @include round(20px);
+    background-color: getColor('bg');
+    padding: 2em 2.25em;
+    box-shadow: 0 4px 16px 0 #0004;
+  }
+  &__title {
+    @extend .heading2;
+    text-transform: capitalize;
+    margin-top: 0.25em;
+    margin-bottom: 0.625em;
+  }
+  &__text {
+    max-width: 25em;
+    margin-bottom: 1.75em;
+    @include fontParams(20px, 1.5, 0, 'regular');
+  }
+  &__button {
+    text-transform: capitalize;
+    line-height: 1;
+    padding: 1em 2em;
+  }
+}

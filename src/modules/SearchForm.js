@@ -7,12 +7,13 @@ import ItemBlockMealCategory from './ItemBlockMealCategory';
 import ItemBlockMealIngredient from './ItemBlockMealIngredient';
 
 class SearchForm {
-	constructor(resultsObj, resultsCallback, ingredientsLib, categoriesLib, areasLib) {		
+	constructor(resultsObj, resultsCallback, ingredientsLib, categoriesLib, areasLib, searchHistoryListId) {		
 		this.isInitialised = false;
 		this.resultsCallback = resultsCallback.bind(resultsObj);
 		this.ingredientsLib = ingredientsLib; // should work as reference to object?
 		this.categoriesLib = categoriesLib;
 		this.areasLib = areasLib;
+		this.searchHistoryListId = searchHistoryListId;
 	}
 
 	async init() {
@@ -36,7 +37,7 @@ class SearchForm {
 		);
 		this.formElement = Utilities.createElementExt('form', SearchForm.className, {workspace: ''});
 		this.formElement.append(
-			await searchBlock('Search by name', 'text', 'searchstring', this.doSearch.bind(this)),
+			await searchBlock('Search by name', 'text', 'searchstring', this.doSearch.bind(this), null, this.searchHistoryListId),
 			await searchBlock('List by first letter', 'letter', 'firstLetter', this.doSearch.bind(this)),
 			await searchBlock('List by category', 'list', 'category', this.doFilter.bind(this), this.categoriesList),
 			await searchBlock('List by area', 'list', 'area', this.doFilter.bind(this), this.areasList),

@@ -55,9 +55,6 @@
     display: flex;
     align-items: center;
     gap: 0.25em;
-    .interactive-icon {
-      // background-color: #ccc;
-    }
   }
   .searchbar {
     position: relative;
@@ -101,17 +98,21 @@
     &:hover,
     &:focus,
     &--expanded {
-      .searchbar__wrapper {
-        background-color: #fffd;
-        box-shadow: 0 0 0.5em 0.5em #fffd;
-      }
       .searchbar__input-wrapper {
         padding-left: 0.5em;
         background-color: getColor('bg2');
       }
-      .searchbar__input,
-      .searchbar__button {
+      .searchbar__input {
         display: inline-block;
+      }
+      &.searchbar--link-to-advanced {
+        .searchbar__wrapper {
+          background-color: #fffd;
+          box-shadow: 0 0 0.5em 0.5em #fffd;
+        }
+        .searchbar__button {
+          display: inline-block;
+        }
       }
     }
   }

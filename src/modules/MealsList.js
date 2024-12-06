@@ -7,22 +7,31 @@ import ItemBlockMeal from './ItemBlockMeal';
 import SearchForm from './SearchForm';
 
 class MealsList {
-	constructor(ingredientsLib, categoriesLib, areasLib) {
+	constructor(ingredientsLib, categoriesLib, areasLib, searchHistoryRef, onFilterFn) {
 		this.isInitialised = false;
 		this.ingredientsLib = ingredientsLib; // should work as reference to object?
 		this.categoriesLib = categoriesLib;
 		this.areasLib = areasLib;
+		this.onFilterFn = onFilterFn;
 		this.meals = [];
 		this.itemBlocks = [];
 		this.formObj = new SearchForm(
 			this,
 			async (result) => {
 				this.clear();
-				this.addMeals(await result);
+				try {
+					await this.addMeals(await result);
+					Utilities.scrollIntoViewIfNeeded(this.listElement);
+				} catch (error) {
+					console.error(error);
+					this.setPlaceholderContent('meals-list__error', 'Something went wrong...', true);
+				}
+				searchHistoryRef.update();
 			}, 
 			this.ingredientsLib, 
 			this.categoriesLib, 
-			this.areasLib
+			this.areasLib,
+			searchHistoryRef.getId()
 		);
 	}
 
@@ -52,6 +61,10 @@ class MealsList {
 		}
 		Utilities.clearChildren(this.headerElement);
 		this.headerElement.appendChild(this.formObj.getElementRef());
+		const inputElement = this.formObj.getElementRef().querySelector('.search-block__input[name="searchstring"]');
+		if(inputElement) {
+			inputElement.focus();
+		}
 	}
 
 	async setHeaderElement(el) {
@@ -63,22 +76,49 @@ class MealsList {
 		this.formObj.prefillTxtSearch(val);
 	}
 
+	submitFormSearch(val) {
+		this.prefillForm(val);
+		this.formObj.doSearch({'searchstring' : val});
+	}
+
+	submitFormFilter(query) {
+		this.formObj.doFilter(query);
+	}
+
+
+	async setPlaceholderContent(className, text, clear) {
+		if(clear !== false) {
+			await this.clear();
+		}
+		this.listElement.appendChild(Utilities.createElementExt('div', className || 'meals-list__placeholder', {}, text));
+	}
+
 	async addMeals(meals) {
-		//TODO: 404 handling
-		// console.log('addMeals', meals);
+		if(meals === null) {
+			this.setPlaceholderContent('meals-list__404', 'No results', true);
+			return;
+		}
+		
 		for(const m of meals) {
 			this.meals.push(m);
-			// this.listElement.appendChild(Utilities.createElementExt('span', [], {}, m?.title));
 			const itemBlock = new ItemBlockMeal(
 				m,
 				async () => {
 					const data = await MealsApi.searchMeals({id: m.id});
 					return data[0]; //TODO: error handling
 				},
-				null,
-				() => {
-					console.log('onExpanded', name); //TODO: accordion behavior
-				},
+				// this.formObj.doFilter.bind(this.formObj),
+				this.onFilterFn,
+				((current) => {
+					// accordion behavior
+					for(const itemBlock of this.itemBlocks) {
+						if(itemBlock !== current) {
+							itemBlock.collapseL2();
+						}
+					}
+				}).bind(this),
+				this.ingredientsLib,
+				this.categoriesLib
 			);
 			this.itemBlocks.push(itemBlock);
 			await itemBlock.init(1);
