@@ -145,8 +145,12 @@ class ItemBlockList {
 		for(let name of this.sortedNamesList.toSorted((a, b) => {
 			const ia = a.toLowerCase().indexOf(searchstring.toLowerCase());
 			const ib = b.toLowerCase().indexOf(searchstring.toLowerCase());
-			const res1 = Math.sign((ib < 0 ? Infinity : ib) - (ia < 0 ? Infinity : ia));
-			return res1 === 0 ? Number(a < b) : res1;
+			const res1 = Number(ia === 0 || a.at(ia-1) === ' ') - Number(ib === 0 || b.at(ib-1) === ' ');
+			if(res1 !== 0) {
+				return res1;
+			}
+			const res2 = Math.sign((ib < 0 ? Infinity : ib) - (ia < 0 ? Infinity : ia));
+			return res2 === 0 ? Number(a < b) : res2;
 		})) {
 			if(name.toLowerCase().includes(searchstring.toLowerCase())) {
 				anyMatch = true;
