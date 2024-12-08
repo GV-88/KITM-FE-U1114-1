@@ -2,6 +2,7 @@ import Utilities from '../../Utilities';
 import {logo, interactiveIcon} from '../common/common';
 import searchbar from './searchbar';
 import './header.scss';
+import IconUser from '../../assets/user.svg';
 
 const header = async function (onSimpleSearch, onAdvancedSearch) {
 	const headerElement = Utilities.createElementExt('header', 'header');
@@ -21,10 +22,10 @@ const header = async function (onSimpleSearch, onAdvancedSearch) {
 	).appendChild(Utilities.createElementExt('ul'));
 
 	const menuLinks = [
-		{title: 'Home', link: '#'},
-		{title: 'Recipe', link: '#'},
+		{title: 'Home', link: '#home'},
+		{title: 'Recipe', link: '#recipe'},
 		{title: 'Community', link: '#'},
-		{title: 'About us', link: '#'},
+		{title: 'About us', link: '#about'},
 	];
 	for(const link of menuLinks) {
 		navListElement.appendChild(Utilities.createElementExt('li')).appendChild(
@@ -35,7 +36,7 @@ const header = async function (onSimpleSearch, onAdvancedSearch) {
 	const buttonGroupElement = headerElement.appendChild(
 		Utilities.createElementExt('div', ['header__block', 'header__block--buttons'])
 	);
-	buttonGroupElement.append(searchbar(onSimpleSearch, onAdvancedSearch), interactiveIcon('assets/user.svg'));
+	buttonGroupElement.append(searchbar(onSimpleSearch, onAdvancedSearch), interactiveIcon(IconUser));
 
 	return headerElement;
 };

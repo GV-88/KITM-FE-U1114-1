@@ -1,0 +1,81 @@
+@use '../../scss/variables' as *;
+@use '../../scss/utilities' as *;
+@use '../../scss/typography' as *;
+@use '../common/common.scss' as *;
+
+.meal-recipe {
+  background-color: getColor('bg');
+  font-size: 18px;
+  padding: var(--spacing);
+  padding-bottom: max(var(--spacing), 1em);
+  --spacing: 0.5em;
+  @media (min-width: $sizeBreakpointSm) {
+    --spacing: 0.75em;
+  }
+  @media (min-width: $sizeBreakpointMd) {
+    --spacing: 1em;
+  }
+  @media (min-width: $sizeBreakpointLg) {
+    --spacing: 1.5em;
+  }
+  @media (min-width: $sizeBreakpointXl) {
+    --spacing: 2em;
+  }
+  &__title {
+    display: inline;
+    @extend .heading2;
+    & + * {
+      margin-top: 1em;
+    }
+  }
+  &__picture {
+    display: inline;
+    float: right;
+    width: auto;
+    @include controlFloatWidth(21em, 14em);
+    margin-bottom: 0.5em;
+    margin-left: 0.5em;
+  }
+  &__ingredients {
+    display: block;
+    clear: both;
+    & .items-list {
+      &__view-toggle {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 4px;
+      }
+    }
+    & > ul {
+      padding: 0;
+      display: grid;
+      width: 100%;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      column-gap: 1em;
+      & > li {
+        display: contents;
+        &.expanded > .item-block {
+          grid-column: 1 / -1;
+        }
+        &.expanded > .meal-recipe__measure {
+          grid-column: 2;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  &__measure {
+    font-size: 16px;
+  }
+  &__instructions p {
+    font-size: 16px;
+    @extend .paragraphSpacing;
+  }
+  &__source {
+    color: getColor('primary');
+    text-decoration: underline;
+    line-height: 1;
+    cursor: pointer;
+  }
+}

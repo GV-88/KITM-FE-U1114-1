@@ -6,12 +6,30 @@
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
+  align-items: start;
   padding-top: 2em;
+  padding-bottom: 2em;
+  row-gap: 1.75em;
+  column-gap: var(--spacing);
+  --spacing: 1.5em;
+  @media (min-width: $sizeBreakpointSm) {
+    --spacing: 2em;
+  }
+  @media (min-width: $sizeBreakpointMd) {
+    --spacing: 3em;
+  }
+  @media (min-width: $sizeBreakpointLg) {
+    --spacing: 4em;
+  }
+  @media (min-width: $sizeBreakpointXl) {
+    --spacing: 6.25em;
+  }
   &__block--logo {
     flex: 0 0 100%;
   }
   .sitemap {
     // flex: 1 0 31%;
+    font-size: 16px;
     ul {
       list-style: none;
       margin: 0;
@@ -19,11 +37,12 @@
     }
     &__group-title {
       @extend .subHeading1;
+      margin: 0.75em 0;
     }
     &__link {
       @extend .subHeading2;
       @include resetLinkStyle();
-      padding: 0.5em 0;
+      line-height: 1.75;
       &:hover {
         color: getColor('secondary');
       }
@@ -32,7 +51,27 @@
       display: flex;
       flex-flow: row wrap;
       justify-content: space-between;
-      gap: 2em;
+      gap: var(--spacing);
+    }
+  }
+  .form {
+    padding-bottom: 1em;
+    border-bottom: solid 1px getColor('label');
+    &__title {
+      @extend .subHeading1;
+      margin: 0.75em 0;
+      margin-bottom: 1.5em;
+    }
+    &__input {
+      @extend .paragraph2;
+      line-height: 2;
+      border: none;
+      outline: none;
+      vertical-align: bottom;
+      margin-bottom: -0.5em;
+    }
+    &__button {
+      padding: 1em 2em;
     }
   }
 }

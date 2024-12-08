@@ -37,12 +37,12 @@ class SearchForm {
 		);
 		this.formElement = Utilities.createElementExt('form', SearchForm.className, {workspace: ''});
 		this.formElement.append(
-			await searchBlock('Search by name', 'text', 'searchstring', this.doSearch.bind(this), null, this.searchHistoryListId),
-			await searchBlock('List by first letter', 'letter', 'firstLetter', this.doSearch.bind(this)),
-			await searchBlock('List by category', 'list', 'category', this.doFilter.bind(this), this.categoriesList),
-			await searchBlock('List by area', 'list', 'area', this.doFilter.bind(this), this.areasList),
-			await searchBlock('List by ingredients', 'list', 'ingredient', this.doFilter.bind(this), this.ingredientsList),
-			await searchBlock('Surprise me', 'random', null, this.doRandom.bind(this)),
+			await searchBlock('text', 'searchstring', 'Search by <b>name</b>', 'name', this.doSearch.bind(this), null, this.searchHistoryListId),
+			await searchBlock('letter', 'firstLetter', 'List by <b>first letter</b>', null, this.doSearch.bind(this)),
+			await searchBlock('list', 'category', 'List by <b>category</b>', 'category', this.doFilter.bind(this), this.categoriesList),
+			await searchBlock('list', 'area', 'List by <b>area</b>', 'area', this.doFilter.bind(this), this.areasList),
+			await searchBlock('list', 'ingredient', 'List by <b>ingredients</b>', 'ingredient', this.doFilter.bind(this), this.ingredientsList),
+			await searchBlock('random', null, 'Surprise me', null, this.doRandom.bind(this)),
 		);
 		this.isInitialised = true;
 	}
@@ -64,7 +64,9 @@ class SearchForm {
 	}
 
 	prefillTxtSearch(val) {
-		this.formElement.querySelector('input').value = val;
+		const inputElement = this.formElement.querySelector('input[name="searchstring"]');
+		inputElement.value = val;
+		inputElement.dispatchEvent(new Event('input'));
 	}
 
 	static className = 'form--search';

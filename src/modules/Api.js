@@ -227,9 +227,8 @@ export class LazyLoadingLibrary {
 	async getItem(identifier) {
 		if(!this.library) {
 			await this.loadLibrary();
-			return this.library.find((obj) => obj[this.listingFieldName] === identifier);
 		}
-		return this.library.find((obj) => obj[this.listingFieldName] === identifier);
+		return this.library.find((obj) => String(obj[this.listingFieldName]).toLowerCase() === String(identifier).toLowerCase());
 	}
 }
 

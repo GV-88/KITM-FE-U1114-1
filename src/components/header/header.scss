@@ -105,15 +105,19 @@
       .searchbar__input {
         display: inline-block;
       }
+      .searchbar__wrapper {
+        background-color: #fffd;
+        box-shadow: 0 0 0.5em 0.5em #fffd;
+      }
       &.searchbar--link-to-advanced {
-        .searchbar__wrapper {
-          background-color: #fffd;
-          box-shadow: 0 0 0.5em 0.5em #fffd;
-        }
         .searchbar__button {
           display: inline-block;
         }
       }
     }
+  }
+  .interactive-icon {
+    padding: 0.5em;
+    border-radius: 1em;
   }
 }

@@ -24,20 +24,20 @@ const footer = async function () {
 		{
 			title: 'Menu',
 			links: [
-				{title: 'Home', link: '#'},
-				{title: 'Recipe', link: '#'},
+				{title: 'Home', link: '#home'},
+				{title: 'Recipe', link: '#recipe'},
 				{title: 'Community', link: '#'},
-				{title: 'About us', link: '#'},
+				{title: 'About us', link: '#about'},
 			]
 		},
 		{
 			title: 'Categories',
 			links: [
-				{title: 'Breakfast', link: '#'},
-				{title: 'Lunch', link: '#'},
-				{title: 'Dinner', link: '#'},
-				{title: 'Dessert', link: '#'},
-				{title: 'Drink', link: '#'},
+				{title: 'Breakfast', link: '#filter_c_breakfast'},
+				{title: 'Lunch', link: '#filter_c_lunch'},
+				{title: 'Dinner', link: '#filter_c_dinner'},
+				{title: 'Dessert', link: '#filter_c_dessert'},
+				{title: 'Drink', link: '#filter_c_drink'},
 			]
 		},
 		{

@@ -1,4 +1,4 @@
-import mealRecipe from '../components/itemBlock/mealRecipe';
+import mealRecipe from '../components/mealRecipe/mealRecipe';
 import Utilities from '../Utilities';
 import ItemBlock from './ItemBlock';
 

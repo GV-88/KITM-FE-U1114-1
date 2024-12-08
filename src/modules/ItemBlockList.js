@@ -4,6 +4,7 @@ class ItemBlockList {
 	constructor(itemBlockConstructor, visualLimit, sourceRef, onSearch, overwriteList) {
 		this.isInitialised = false;
 		this.isThumbnailDisplay = false;
+		this.isLimited = false;
 		this.itemBlockConstructor = itemBlockConstructor;
 		this.visualLimit = visualLimit;
 		this.source = sourceRef;
@@ -17,9 +18,7 @@ class ItemBlockList {
 		return this.itemBlockConstructor(
 			this.source.basicItemConstructor(name),
 			this.source.getItem.bind(this.source),
-			(q) => {
-				this.onSearchFn(q);
-			},
+			this.onSearchFn,
 			((current) => {
 				// accordion behavior
 				for(const itemBlock of this.itemBlocks) {
@@ -74,16 +73,18 @@ class ItemBlockList {
 			await this.addItemBlock(name, false);
 			count++;
 			if(limit && this.visualLimit && count >= this.visualLimit) {
+				this.isLimited = true;
 				if(this.showAllElement) {
 					this.showAllElement.classList.remove('hidden');
 				} else {
-					this.showAllElement = Utilities.createElementExt('a', this.className+'__show-all', {}, 'show all');
+					this.showAllElement = Utilities.createElementExt('a', ItemBlockList.className+'__show-all', {}, 'show all');
 					this.containerElement.appendChild(this.showAllElement);
 					this.showAllElement.addEventListener('click', (e) => {
 						e.preventDefault();
 						Utilities.clearChildren(this.listElement);
 						this.itemBlocks = [];
 						this.fillContent();
+						this.isLimited = false;
 						e.target.classList.add('hidden');
 					});
 				}
@@ -106,10 +107,10 @@ class ItemBlockList {
 	}
 
 	addToggleControl() {
-		const inputGroupElement = Utilities.createElementExt('div', ItemBlockList.className + '__view-toggle');
+		const inputGroupElement = Utilities.createElementExt('div', [ItemBlockList.className + '__view-toggle', 'md-container']);
 		const inputElement = Utilities.createElementExt('input', [], {type: 'checkbox'});
 		inputGroupElement
-			.appendChild(Utilities.createElementExt('label'))
+			.appendChild(Utilities.createElementExt('label', 'input-wrapper-checkbox'))
 			.append(inputElement, document.createTextNode('thumbnails'));
 		inputElement.addEventListener('change', (e) => this.toggleThumbnails(e.currentTarget.checked));
 		this.containerElement.appendChild(inputGroupElement);
@@ -147,7 +148,7 @@ class ItemBlockList {
 				await this.addItemBlock(name, true);
 			}
 		}
-		if(anyMatch && this.visualLimit && this.listElement.children.length > this.visualLimit) {
+		if(anyMatch && this.isLimited && this.visualLimit && this.listElement.children.length > this.visualLimit) {
 			this.removeItemsFromBottom(this.listElement.children.length - this.visualLimit);
 		}
 	}

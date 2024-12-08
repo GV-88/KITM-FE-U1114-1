@@ -4,7 +4,7 @@ import ItemBlockList from '../../modules/ItemBlockList';
 import ItemBlockMealArea from '../../modules/ItemBlockMealArea';
 import ItemBlockMealCategory from '../../modules/ItemBlockMealCategory';
 import ItemBlockMealIngredient from '../../modules/ItemBlockMealIngredient';
-import './itemBlock.scss';
+import './mealRecipe.scss';
 
 const mealRecipe = async function (dataObj, ingredientsLib, categoriesLib, onSearch) {
 
@@ -32,16 +32,19 @@ const mealRecipe = async function (dataObj, ingredientsLib, categoriesLib, onSea
 
 	const titleElement = Utilities.createElementExt('h3', 'meal-recipe__title', {}, dataObj.title);
 	const pictureElement = Utilities.createElementExt('img', 'meal-recipe__picture', {src: dataObj.getImageUrl()});
-	const instructionsElement = Utilities.createElementExt('p', 'meal-recipe__instructions', {}, dataObj.strInstructions);
+	const instructionsElement = Utilities.createElementExt('div', 'meal-recipe__instructions');
 	const sourceElement = dataObj.strSource ? Utilities.createElementExt(
 		'a', 'meal-recipe__source', {href: dataObj.strSource, target: '_blank'}, 'source'
 	) : null;
+
+	instructionsElement.append(...(Utilities.stringToParagraphs(dataObj.strInstructions)));
 
 	const containerElement = Utilities.createElementExt('div', 'meal-recipe', 
 		{'data-id': dataObj.id, 'data-title': Utilities.cleanString(dataObj.title)});
 
 	await ingredientsList.init();
 	const ingredientsElement = ingredientsList.getElementRef();
+	ingredientsElement.classList.add('meal-recipe__ingredients');
 
 	//hack: inject additional elements into component DOM
 	ingredientsElement.querySelectorAll('li').forEach((el) => {
@@ -55,8 +58,8 @@ const mealRecipe = async function (dataObj, ingredientsLib, categoriesLib, onSea
 	await areaBlock.init();
 
 	for(let el of [
-		titleElement,
 		pictureElement,
+		titleElement,
 		categoryBlock.getElementRef(),
 		areaBlock.getElementRef(),
 		ingredientsElement,

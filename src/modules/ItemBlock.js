@@ -1,5 +1,8 @@
 import { interactiveIcon } from '../components/common/common';
 import Utilities from '../Utilities';
+import IconSearch from '../assets/search.svg';
+import IconCircleInfo from '../assets/circle-info-solid.svg';
+import IconCircleChevronRight from '../assets/circle-chevron-right-solid.svg';
 
 class ItemBlock {
 	constructor(initialData, dataGetter, onSearch, onExpanded) {
@@ -41,8 +44,19 @@ class ItemBlock {
 
 	async loadAndAppendData() {
 		const srcObj = await this.dataGetter(this.dataObj[this.identifierFieldName]);
-		if(srcObj) { this.appendData(srcObj); };
+		if(srcObj) {
+			this.appendData(srcObj);
+			if(this.isInitialised) {
+				this.titleElement.innerText = this.dataObj.title;
+			}
+		};
 	}
+
+	searchHandler() {
+		if(typeof this.onSearch === 'function') {
+			this.onSearch({ [this.searchQueryFieldName]: this.dataObj[this.identifierFieldName] }, this.dataObj.title);
+		}
+	};
 
 	async init(expandLevel) {
 		this.containerElement = Utilities.createElementExt('div', ItemBlock.className, {'data-title': Utilities.cleanString(this.dataObj.title)});
@@ -66,7 +80,7 @@ class ItemBlock {
 				this.pictureElement.src = imgSrc;
 			}
 		} else {
-			this.pictureElement = Utilities.createElementExt('img', 'item-block__picture', {src: imgSrc});
+			this.pictureElement = Utilities.createElementExt('img', ItemBlock.className+'__picture', {src: imgSrc});
 		}
 		if(!(this.pictureElement.isConnected) || this.pictureElement.parentElement !== parentElement) {
 			parentElement.appendChild(this.pictureElement);
@@ -77,21 +91,32 @@ class ItemBlock {
 		Utilities.smoothRemove(parentElement, this.pictureElement);
 	}
 
+	addSearchLink(parentElement) {
+		const searchLinkWrapperElement = Utilities.createElementExt('label', ItemBlock.className+'__search-link');
+		searchLinkWrapperElement.append(
+			interactiveIcon(IconSearch),
+			'List related meals'
+		);
+		parentElement.appendChild(searchLinkWrapperElement);
+		searchLinkWrapperElement.addEventListener('click', this.searchHandler.bind(this));
+	}
+
+	removeSearchLink(parentElement) {
+		Utilities.smoothRemove(parentElement, parentElement.querySelector(`.${ItemBlock.className}__search-link`));
+	}
+
 	async addInitialContent() {
 		if(this.availableActions?.length ?? 0 > 0) {
-			const buttonGroupElement = Utilities.createElementExt('div', 'item-block__button-group');
+			const buttonGroupElement = Utilities.createElementExt('div', ItemBlock.className+'__button-group');
 			if(this.availableActions.includes('search')) {
-				this.searchButtonElement = interactiveIcon('assets/search.svg');
+				this.searchButtonElement = interactiveIcon(IconSearch);
 				this.searchButtonElement.title = 'list meals';
 				buttonGroupElement.appendChild(this.searchButtonElement);
-				this.searchButtonElement.addEventListener('click', () => {
-					if(typeof this.onSearch === 'function') {
-						this.onSearch({[this.searchQueryFieldName]: this.dataObj[this.identifierFieldName] });
-					}
-				});
+				this.searchButtonElement.addEventListener('click', this.searchHandler.bind(this));
 			}
 			if(this.availableActions.includes('expand')) {
-				this.expandButtonElement = interactiveIcon('assets/circle-info-solid.svg');
+				this.expandButtonElement = interactiveIcon(IconCircleInfo);
+				this.expandButtonElement.classList.add('interactive-icon--toggle-panel');
 				this.expandButtonElement.title = 'more about this item';
 				buttonGroupElement.appendChild(this.expandButtonElement);
 				this.expandButtonElement.addEventListener('click', this.expandL2.bind(this), {once: true});
@@ -153,7 +178,8 @@ class ItemBlock {
 		await this.addFullContent();
 		this.containerElement.classList.add(ItemBlock.className + '--expanded');
 		if(this.expandButtonElement) {
-			this.expandButtonElement.querySelector('img').src = 'assets/circle-chevron-down-solid.svg';
+			this.expandButtonElement.querySelector('img').src = IconCircleChevronRight; //CSS transforms to expanded state
+			this.expandButtonElement.title = 'collapse panel';
 			this.expandButtonElement.addEventListener('click', this.collapseL2.bind(this), {once: true});
 		}
 		const parentElement = this.containerElement.closest('li');
@@ -182,7 +208,8 @@ class ItemBlock {
 		await this.removeFullContent();
 		this.containerElement.classList.remove(ItemBlock.className + '--expanded');
 		if(this.expandButtonElement) {
-			this.expandButtonElement.querySelector('img').src = 'assets/circle-info-solid.svg';
+			this.expandButtonElement.querySelector('img').src = IconCircleInfo;
+			this.expandButtonElement.title = 'more about this item';
 			this.expandButtonElement.addEventListener('click', this.expandL2.bind(this), {once: true});
 		}
 		const parentElement = this.containerElement.closest('li');

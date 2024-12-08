@@ -16,3 +16,8 @@
 .hidden {
   display: none;
 }
+
+@mixin controlFloatWidth($minInline, $minFloat, $maxFloat: 100%) {
+  min-width: $minFloat;
+  max-width: min($maxFloat, calc(100% - clamp(0px, round(down, calc(100% - $minFloat), $minInline), $minInline)));
+}

@@ -32,9 +32,9 @@ class Utilities {
 
 	static toggleClassByCondition(element, cssClass, condition) {
 		if (condition) {
-			element.classList.remove(cssClass);
-		} else {
 			element.classList.add(cssClass);
+		} else {
+			element.classList.remove(cssClass);
 		}
 	}
 
@@ -90,6 +90,10 @@ class Utilities {
 	static cleanString(str) {
 		if (str == '') return 'x';
 		return str.replaceAll(/[^a-z^\d]/gi, '').toLowerCase();
+	}
+
+	static stringToParagraphs(str, classList) {
+		return str ? str.split(/\n|\r/).filter(i => i.match(/\S/i)).map(i => Utilities.createElementExt('p', classList, {}, i)) : [];
 	}
 };
 

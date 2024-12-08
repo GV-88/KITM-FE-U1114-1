@@ -27,16 +27,19 @@ class ItemBlockMealIngredient extends ItemBlock {
 
 	async addFullContent() {
 		await super.addFullContent();
+		//not very wise to construct strings every time, maybe should keep parsed array of strings in data object
 		this.containerElement.append(
 			Utilities.createElementExt('div', ItemBlock.className + '__type', {}, this.dataObj.strType),
-			Utilities.createElementExt('p', ItemBlock.className + '__description', {}, this.dataObj.strDescription)
+			...(Utilities.stringToParagraphs(this.dataObj.strDescription, ItemBlock.className + '__description'))
 		);
+		super.addSearchLink(this.containerElement);
 	}
 
 	removeFullContent() {
 		super.removeFullContent();
-		Utilities.smoothRemove(this.containerElement, this.containerElement.querySelector('.' + ItemBlock.className + '__description'));
+		this.containerElement.querySelectorAll('.' + ItemBlock.className + '__description').forEach(el => this.containerElement.removeChild(el));
 		Utilities.smoothRemove(this.containerElement, this.containerElement.querySelector('.' + ItemBlock.className + '__type'));
+		super.removeSearchLink(this.containerElement);
 	}
 
 }

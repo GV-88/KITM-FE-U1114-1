@@ -26,9 +26,11 @@ const categoriesLibrary = new CategoriesLibrary();
 const areasLibrary = new AreasLibrary();
 const searchHistory = new SearchHistory('datalist-searchstring');
 
-const mealsListObj = new MealsList(ingredientsLibrary, categoriesLibrary, areasLibrary, searchHistory, async (q) => {
-	await switchToBrowsingMode();
-	mealsListObj.submitFormFilter(q);
+const mealsListObj = new MealsList(ingredientsLibrary, categoriesLibrary, areasLibrary, searchHistory, async (query, title) => {
+	// await switchToBrowsingMode();
+	// mealsListObj.submitFormFilter(query);
+	await prepareMealsList(false, title);
+	mealsListObj.displayResult(MealsApi.filterMeals(query));
 });
 let mealsListElement;
 let innerContainerElement;
@@ -40,13 +42,14 @@ const buildLandingPageContent = async () => {
 		mealsListElement, //moves if existing
 		aboutSection()
 	);
+	innerContainerElement.querySelector('.hero__link[href="#recipes"]').addEventListener('click', switchToBrowsingMode);
 	loadLandingFeaturedMeals(3);
 	await mealsListObj.setHeaderElement(listHeader());
 	innerContainerElement.querySelector('.hero__button').addEventListener('click', () => switchToBrowsingMode());
 	mealsListElement.querySelector('.list-header__button').addEventListener('click', () => switchToBrowsingMode());
 };
 
-const switchToBrowsingMode = async (prefillSearch) => {
+const switchToBrowsingMode = async (preventDefault) => {
 	if(state.pageMode === 'browsing') {
 		return;
 	}
@@ -55,12 +58,12 @@ const switchToBrowsingMode = async (prefillSearch) => {
 		Utilities.smoothRemove(innerContainerElement, el);
 	});
 	state.pageMode = 'browsing';
-	mealsListObj.clear();
-	await mealsListObj.addForm();
-	if(typeof (prefillSearch ?? null) === 'string') {
-		mealsListObj.prefillForm(prefillSearch);
+
+	if(preventDefault === true) {
+		return;
 	}
-	document.querySelector('.searchbar').classList.remove('searchbar--link-to-advanced');
+	//default when switching from landing mode
+	prepareMealsList(true, null);
 };
 
 const switchToLandingMode = () => {
@@ -71,6 +74,18 @@ const switchToLandingMode = () => {
 	buildLandingPageContent();
 	state.pageMode = 'landing';
 	document.querySelector('.searchbar').classList.add('searchbar--link-to-advanced');
+};
+
+const prepareMealsList = async (hasForm, title) => {
+	switchToBrowsingMode(true);
+	mealsListObj.clear();
+	Utilities.toggleClassByCondition(document.querySelector('.searchbar'), 'searchbar--link-to-advanced', hasForm === false);
+	if(title !== undefined) {
+		await mealsListObj.setHeaderElement(title ? listHeader(title) : null);
+	}
+	if(hasForm ?? true) {
+		await mealsListObj.addForm();
+	}
 };
 
 const loadLandingFeaturedMeals = async (number) => {
@@ -94,12 +109,18 @@ const loadLandingFeaturedMeals = async (number) => {
 const buildInitContent = async () => {
 	const headerElement = pageContainerElement.appendChild(await header(
 		async (val) => {
-			await switchToBrowsingMode(val);
+			await prepareMealsList(true, null);
 			if(val) {
+				mealsListObj.prefillForm(val);
 				mealsListObj.submitFormSearch(val);
 			}
 		},
-		(val) => { switchToBrowsingMode(val); }
+		async (val) => {
+			await prepareMealsList(true, null);
+			if(val) {
+				mealsListObj.prefillForm(val);
+			}
+		}
 	));
 	innerContainerElement = pageContainerElement.appendChild(Utilities.createElementExt('div', 'inner-container'));
 	const footerElement = pageContainerElement.appendChild(await footer());
@@ -108,8 +129,17 @@ const buildInitContent = async () => {
 	buildLandingPageContent();
 	headerElement.querySelector('.logo').addEventListener('click', switchToLandingMode);
 	footerElement.querySelector('.logo').addEventListener('click', switchToLandingMode);
-	Array.from(headerElement.querySelectorAll('.header__nav-link')).find(el => el.innerText === 'Home').addEventListener('click', switchToLandingMode);
-	Array.from(headerElement.querySelectorAll('.header__nav-link')).find(el => el.innerText === 'Recipe').addEventListener('click', switchToBrowsingMode);
+	headerElement.querySelector('.header__nav-link[href="#home"]').addEventListener('click', switchToLandingMode);
+	headerElement.querySelector('.header__nav-link[href="#recipe"]').addEventListener('click', switchToBrowsingMode);
+	headerElement.querySelector('.header__nav-link[href="#about"]').addEventListener('click', switchToLandingMode);
+	footerElement.querySelector('.sitemap__link[href="#home"]').addEventListener('click', switchToLandingMode);
+	footerElement.querySelector('.sitemap__link[href="#recipe"]').addEventListener('click', switchToBrowsingMode);
+	footerElement.querySelector('.sitemap__link[href="#about"]').addEventListener('click', switchToLandingMode);
+	footerElement.querySelectorAll('.sitemap__link[href^="#filter_c_"]').forEach(el => el.addEventListener('click', async (e) => {
+		const q = e.currentTarget.href.split('filter_c_').at(-1);
+		await prepareMealsList(false, e.currentTarget.innerText);
+		mealsListObj.displayResult(MealsApi.filterMeals({category: q}));
+	}));
 	headerElement.querySelector('.searchbar__input').setAttribute('list', searchHistory.getId());
 	await searchHistory.init();
 	pageContainerElement.appendChild(searchHistory.getElementRef());

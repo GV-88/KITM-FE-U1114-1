@@ -20,10 +20,15 @@
   }
 }
 
+.interactive-icon-hover {
+  background-color: color.scale($color: getColor('fg'), $alpha: -90%);
+}
+
 .interactive-icon {
+  // best to set font size divisible by 8
   display: inline-block;
-  padding: 0.5em;
-  border-radius: 1em;
+  padding: 0.375em;
+  border-radius: 0.875em;
   transition: 150ms;
   cursor: pointer;
   img {
@@ -31,7 +36,23 @@
     height: 1em;
   }
   &:hover {
-    background-color: color.scale($color: getColor('fg'), $alpha: -90%);
+    @extend .interactive-icon-hover;
+  }
+}
+
+.interactive-icon-with-label {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  max-width: fit-content;
+  gap: 2px;
+  cursor: pointer;
+  color: getColor('label');
+  &:hover {
+    color: getColor('fg');
+    .interactive-icon {
+      @extend .interactive-icon-hover;
+    }
   }
 }
 
@@ -55,3 +76,111 @@
   @include round();
   @extend .butonFont1;
 }
+
+/*#region checkboxes & radio*/
+/* https://m3.material.io/components/radio-button/specs */
+/* https://m3.material.io/components/checkbox/specs */
+
+.md-container {
+  .radio-item-wrapper,
+  .checkbox-item-wrapper,
+  .input-wrapper-checkbox {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+  }
+
+  .input-wrapper-checkbox {
+    gap: 8px;
+  }
+
+  input[type='radio'] {
+    position: relative;
+
+    -webkit-appearance: none;
+    appearance: none;
+    display: grid;
+    place-content: center;
+
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border-style: solid;
+    border-width: 2px;
+
+    border-color: getColor('label'); //var(--md-sys-color-on-surface-variant);
+    &::after {
+      content: '';
+      transform: scale(0);
+      transition: 100ms transform ease-in-out;
+
+      border-radius: 50%;
+      width: 10px;
+      height: 10px;
+
+      background-color: getColor('primary'); //var(--md-sys-color-primary);
+    }
+    &:checked {
+      border-color: getColor('primary'); //var(--md-sys-color-primary);
+      &::after {
+        transform: scale(1);
+      }
+    }
+  }
+
+  input[type='checkbox'] {
+    position: relative;
+
+    -webkit-appearance: none;
+    appearance: none;
+
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border-radius: 2px;
+    border-style: solid;
+    border-width: 2px;
+
+    background-color: #0000;
+    border-color: getColor('label'); //var(--md-sys-color-on-surface-variant);
+    &:disabled {
+      border-color: getColor('fg'); //var(--md-sys-color-on-surface);
+      opacity: 38%;
+    }
+    &:checked {
+      border-style: none;
+      background-color: getColor('primary'); //var(--md-sys-color-primary);
+      &::after {
+        content: '';
+        position: absolute;
+        border-left-style: solid;
+        border-bottom-style: solid;
+        border-width: 2px;
+        height: 5px;
+        width: 9px;
+        left: 4px;
+        bottom: 7px;
+        transform: rotate(-45deg);
+        color: getColor('onPrimary'); //var(--md-sys-color-on-primary);
+      }
+    }
+    &:enabled:not(input:checked):hover {
+      background-color: color.scale($color: getColor('fg'), $alpha: -90%);
+    }
+
+    input[type='radio']:enabled:hover::before,
+    input[type='checkbox']:enabled:hover::before {
+      content: '';
+      position: absolute;
+      top: -11px;
+      left: -11px;
+      right: -11px;
+      bottom: -11px;
+      border-radius: 20px;
+
+      background-color: color.scale($color: getColor('fg'), $alpha: -90%);
+    }
+  }
+}
+
+/*#endregion*/

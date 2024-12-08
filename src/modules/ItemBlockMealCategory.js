@@ -27,12 +27,15 @@ class ItemBlockMealCategory extends ItemBlock {
 
 	async addFullContent() {
 		await super.addFullContent();
-		this.containerElement.appendChild(Utilities.createElementExt('p', ItemBlock.className + '__description', {}, this.dataObj.strCategoryDescription));
+		//not very wise to construct strings every time, maybe should keep parsed array of strings in data object
+		this.containerElement.append(...(Utilities.stringToParagraphs(this.dataObj.strCategoryDescription, ItemBlock.className + '__description')));
+		super.addSearchLink(this.containerElement);
 	}
 
 	removeFullContent() {
 		super.removeFullContent();
-		Utilities.smoothRemove(this.containerElement, this.containerElement.querySelector('.' + ItemBlock.className + '__description'));
+		this.containerElement.querySelectorAll('.' + ItemBlock.className + '__description').forEach(el => this.containerElement.removeChild(el));
+		super.removeSearchLink(this.containerElement);
 	}
 
 }

@@ -1,27 +1,103 @@
 @use '../../scss/variables' as *;
 @use '../../scss/typography' as *;
 @use '../../scss/utilities' as *;
+@use '../common/common.scss' as *;
 
 .search-block {
+  font-size: 16px; //on parent for relative em
   background-color: getColor('bg2');
   @include round();
-  padding: 0.5em;
+  padding: 0.5em 0.75em;
+  min-width: 16em;
   flex-grow: 1;
   flex-basis: 34%;
   &--letter {
     flex-basis: 68%;
   }
-  &__list-header {
-    display: flex;
-  }
-  .items-list ul {
-    list-style: none;
-    margin: 0;
-    padding-left: 1em;
-    column-count: auto;
-    column-width: 16em;
-    li.expanded {
-      column-span: all;
+  &__label {
+    margin-bottom: 0.25em;
+    b {
+      font-weight: 600;
     }
+  }
+  &__input {
+    font-size: 18px;
+    line-height: 2;
+    padding: 0 0.5em;
+    @include round(1em);
+    background-color: getColor('bg1');
+    border: none;
+    outline: none;
+    &:focus {
+      background-color: getColor('bg');
+    }
+    &::placeholder {
+      color: getColor('label');
+    }
+    & + .btn {
+      margin-left: 0.25em;
+    }
+  }
+  &__button {
+    font-size: 18px;
+  }
+  &__alphabet {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 0.25em;
+    line-height: 1.5em;
+  }
+  &__letter {
+    text-decoration: underline;
+    cursor: pointer;
+    &:hover {
+      font-weight: 600;
+    }
+  }
+  &__list-header {
+    @extend .interactive-icon-with-label;
+    .interactive-icon {
+      font-size: 24px;
+    }
+    &.expanded {
+      .interactive-icon--toggle-panel {
+        transform: rotate(90deg);
+      }
+      &:hover .interactive-icon--toggle-panel {
+        transform: rotate(0);
+      }
+    }
+    &:not(.expanded):hover .interactive-icon--toggle-panel {
+      transform: rotate(90deg);
+    }
+  }
+  .items-list {
+    position: relative;
+    ul {
+      padding-left: 0.5em;
+      column-count: auto;
+      column-width: 16em;
+      li.expanded {
+        column-span: all;
+      }
+    }
+    &__view-toggle {
+      // a bad hack, very specific to this case
+      position: absolute;
+      right: 0;
+      top: -24px;
+    }
+    &__show-all {
+      line-height: 2;
+      margin-left: 1em;
+      cursor: pointer;
+      color: getColor('label');
+      &:hover {
+        color: getColor('fg');
+      }
+    }
+  }
+  &[data-queryfieldname='area'] .items-list__view-toggle {
+    display: none;
   }
 }

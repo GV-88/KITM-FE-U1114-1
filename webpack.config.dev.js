@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = (env) => ({
 	entry: './src/app.js', //main js file
@@ -50,6 +51,15 @@ module.exports = (env) => ({
 		}),
 		new MiniCssExtractPlugin({
 			filename: 'style.css',
+		}),
+		//this is the only difference for dev config:
+		new CopyPlugin({
+			patterns: [
+				{
+					from: 'working/response_sample*.json',
+					to: path.resolve(__dirname, 'public', 'test_data', '[base]')
+				},
+			]
 		}),
 		new ESLintPlugin({
 		// https://eslint.org/docs/latest/integrate/nodejs-api#-new-eslintoptions

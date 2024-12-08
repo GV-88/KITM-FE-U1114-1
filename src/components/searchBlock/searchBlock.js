@@ -1,11 +1,16 @@
 import Utilities from '../../Utilities';
 import {interactiveIcon} from '../common/common';
 import './SearchBlock.scss';
+import IconCircleChevronRight from '../../assets/circle-chevron-right-solid.svg';
 
-const searchBlock = async (label, type, queryFieldName, onSearch, listObj, datalistId) => {
+const searchBlock = async (type, queryFieldName, label, inputPlaceholder, onSearch, listObj, datalistId) => {
 	const searchBlockElement = Utilities.createElementExt('div', 'search-block');
-	searchBlockElement.appendChild(
+	if(queryFieldName) {
+		searchBlockElement.dataset['queryfieldname'] = queryFieldName;
+	}
+	const labelElement = searchBlockElement.appendChild(
 		Utilities.createElementExt('div', 'search-block__label', {}, label));
+	labelElement.innerHTML = label;
 	if(type === 'text') {
 
 		const inputHandler = (e) => {
@@ -14,7 +19,7 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj, datal
 
 		searchBlockElement.classList.add('search-block--text');
 		const inputElement = searchBlockElement.appendChild(
-			Utilities.createElementExt('input', 'search-block__input', {type: 'text', name: queryFieldName})
+			Utilities.createElementExt('input', 'search-block__input', {type: 'text', name: queryFieldName, placeholder: inputPlaceholder})
 		);
 		const buttonElement = searchBlockElement.appendChild(
 			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit', disabled: ''}, 'Search')
@@ -25,16 +30,6 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj, datal
 			e.preventDefault();
 			onSearch({[queryFieldName]: inputElement.value});
 		});
-
-		// const searchHistory = await Storage.getMealSearches();
-		// if(searchHistory?.length) {
-		// 	const datalistElement = Utilities.createElementExt('datalist', [], {id:'datalist-' + queryFieldName});
-		// 	for(let str of searchHistory) {
-		// 		datalistElement.appendChild(Utilities.createElementExt('option', [], {value: str}));
-		// 	}
-		// 	searchBlockElement.appendChild(datalistElement);
-		// 	inputElement.setAttribute('list', 'datalist-' + queryFieldName);
-		// }
 	}
 	if(type === 'list') {
 		let isExpandedState = false;
@@ -65,8 +60,8 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj, datal
 
 		const expandList = async () => {
 			isExpandedState = undefined;
-			toggleListButton.querySelector('img').src = 'assets/circle-chevron-down-solid.svg';
 			listLabelElement.classList.add('hidden');
+			listHeaderElement.classList.add('expanded');
 			//TODO: visually limit the list size
 			if(!listObj.isInitialised) {
 				await listObj.init();
@@ -81,8 +76,8 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj, datal
 
 		const collapseList = () => {
 			isExpandedState = undefined;
-			toggleListButton.querySelector('img').src = 'assets/circle-chevron-right-solid.svg';
 			listLabelElement.classList.remove('hidden');
+			listHeaderElement.classList.remove('expanded');
 			Utilities.smoothRemove(searchBlockElement, listObj.getElementRef());
 			isExpandedState = false;
 		};
@@ -96,9 +91,10 @@ const searchBlock = async (label, type, queryFieldName, onSearch, listObj, datal
 		};
 
 		searchBlockElement.classList.add('search-block--list');
-		const inputElement = Utilities.createElementExt('input', 'search-block__input', {type: 'text', name: queryFieldName});
+		const inputElement = Utilities.createElementExt('input', 'search-block__input', {type: 'text', name: queryFieldName, placeholder: inputPlaceholder});
 		const listHeaderElement = Utilities.createElementExt('div','search-block__list-header');
-		const toggleListButton = interactiveIcon('assets/circle-chevron-right-solid.svg');
+		const toggleListButton = interactiveIcon(IconCircleChevronRight);
+		toggleListButton.classList.add('interactive-icon--toggle-panel');
 		const listLabelElement = Utilities.createElementExt('div', 'search-block__list-label', {}, 'show list');
 		const buttonElement = searchBlockElement.appendChild(
 			Utilities.createElementExt('button', ['btn', 'search-block__button'], {type: 'submit', disabled: ''}, 'List meals')

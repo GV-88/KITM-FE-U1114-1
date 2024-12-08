@@ -10,7 +10,7 @@ const aboutSection = () => {
 		`),
 		Utilities.createElementExt('button', ['btn','about-section__button'], {}, 'Learn more'),
 	);
-	const sectionElement = Utilities.createElementExt('section', 'about-section', {landing: ''});
+	const sectionElement = Utilities.createElementExt('section', 'about-section', {landing: '', id: 'about'});
 	sectionElement.append(aboutCardElement);
 	return sectionElement;
 };

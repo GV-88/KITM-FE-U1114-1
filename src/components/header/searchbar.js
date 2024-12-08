@@ -1,10 +1,11 @@
 import Utilities from '../../Utilities';
 import {interactiveIcon} from '../common/common';
 import './header.scss';
+import IconSearch from '../../assets/search.svg';
 
 const searchbar = (onSimpleSearch, onAdvancedSearch) => {
 	const inputElement = Utilities.createElementExt('input', 'searchbar__input', {type:'search', placeholder:'search', size:16});
-	const iconElement = interactiveIcon('assets/search.svg');
+	const iconElement = interactiveIcon(IconSearch);
 	const buttonElement = Utilities.createElementExt('button', ['btn', 'searchbar__button'], {}, 'advanced search');
 	const inputWrapperElement = Utilities.createElementExt('div', 'searchbar__input-wrapper');
 	const allWrapperElement = Utilities.createElementExt('div', 'searchbar__wrapper');

@@ -12,26 +12,17 @@ class MealsList {
 		this.ingredientsLib = ingredientsLib; // should work as reference to object?
 		this.categoriesLib = categoriesLib;
 		this.areasLib = areasLib;
+		this.searchHistoryRef = searchHistoryRef;
 		this.onFilterFn = onFilterFn;
 		this.meals = [];
 		this.itemBlocks = [];
 		this.formObj = new SearchForm(
 			this,
-			async (result) => {
-				this.clear();
-				try {
-					await this.addMeals(await result);
-					Utilities.scrollIntoViewIfNeeded(this.listElement);
-				} catch (error) {
-					console.error(error);
-					this.setPlaceholderContent('meals-list__error', 'Something went wrong...', true);
-				}
-				searchHistoryRef.update();
-			}, 
+			this.displayResult,
 			this.ingredientsLib, 
 			this.categoriesLib, 
 			this.areasLib,
-			searchHistoryRef.getId()
+			this.searchHistoryRef.getId()
 		);
 	}
 
@@ -69,7 +60,9 @@ class MealsList {
 
 	async setHeaderElement(el) {
 		Utilities.clearChildren(this.headerElement);
-		this.headerElement.appendChild(el);
+		if(el) {
+			this.headerElement.appendChild(el);
+		}
 	}
 
 	prefillForm(val) {
@@ -124,6 +117,18 @@ class MealsList {
 			await itemBlock.init(1);
 			this.listElement.appendChild(itemBlock.getElementRef());
 		}
+	}
+
+	async displayResult(result) {
+		this.clear();
+		try {
+			await this.addMeals(await result);
+			Utilities.scrollIntoViewIfNeeded(this.listElement);
+		} catch (error) {
+			console.error(error);
+			this.setPlaceholderContent('meals-list__error', 'Something went wrong...', true);
+		}
+		this.searchHistoryRef.update();
 	}
 
 	async clear() {

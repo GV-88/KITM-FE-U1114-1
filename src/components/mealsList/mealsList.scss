@@ -1,0 +1,44 @@
+@use '../../scss/variables' as *;
+
+.meals-list {
+  $itemMinWidth: 264px;
+  --spacing: 8px;
+  @media (min-width: $sizeBreakpointSm) {
+    --spacing: 16px;
+  }
+  @media (min-width: $sizeBreakpointMd) {
+    --spacing: 32px;
+  }
+  @media (min-width: $sizeBreakpointLg) {
+    --spacing: 40px;
+  }
+  @media (min-width: $sizeBreakpointXl) {
+    --spacing: 56px;
+  }
+  &__meals {
+    display: grid;
+    grid-auto-flow: dense;
+    grid-template-columns: repeat(auto-fit, minmax($itemMinWidth, auto));
+    width: 100%;
+    justify-items: stretch;
+    justify-content: stretch;
+    gap: var(--spacing);
+    padding-top: var(--spacing);
+    padding-bottom: var(--spacing);
+    .item-block--meal {
+      &:not(.item-block--expanded) {
+        grid-column: span 1;
+        min-width: $itemMinWidth;
+        max-width: calc($itemMinWidth * 2);
+      }
+      &.item-block--expanded {
+        display: block;
+        grid-column: 1 / -1;
+      }
+    }
+  }
+  &__error,
+  &__404 {
+    font-size: 24px;
+  }
+}

@@ -21,7 +21,7 @@
   &__link {
     @include resetLinkStyle(getColor('primary'));
   }
-  &__button {
+  &__button.btn {
     @include fontParams(20px, auto, 0.5px, 'semibold');
     text-transform: capitalize;
     padding: 1.5em 2em;
@@ -51,7 +51,7 @@
   &__subtitle {
     @extend .paragraph1;
   }
-  &__button {
+  &__button.btn {
     @extend .butonFont1;
     padding: 1em 2em;
   }
@@ -83,7 +83,7 @@
   &__card {
     margin: 1em 1.5em 2.5em 1.5em;
     width: fit-content;
-    @include round(20px);
+    @include round();
     background-color: getColor('bg');
     padding: 2em 2.25em;
     box-shadow: 0 4px 16px 0 #0004;
@@ -99,7 +99,7 @@
     margin-bottom: 1.75em;
     @include fontParams(20px, 1.5, 0, 'regular');
   }
-  &__button {
+  &__button.btn {
     text-transform: capitalize;
     line-height: 1;
     padding: 1em 2em;
