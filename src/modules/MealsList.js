@@ -120,7 +120,7 @@ class MealsList {
 	}
 
 	async displayResult(result) {
-		this.clear();
+		await this.clear();
 		try {
 			await this.addMeals(await result);
 			Utilities.scrollIntoViewIfNeeded(this.listElement);

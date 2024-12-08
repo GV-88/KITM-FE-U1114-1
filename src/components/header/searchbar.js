@@ -33,6 +33,7 @@ const searchbar = (onSimpleSearch, onAdvancedSearch) => {
 	inputElement.addEventListener('keydown', (e) => {
 		if(e.key === 'Enter' && inputElement.value.trim() != '') {
 			e.stopPropagation();
+			e.preventDefault();
 			containerElement.classList.remove('searchbar--expanded');
 			onSimpleSearch(inputElement.value);
 		}
