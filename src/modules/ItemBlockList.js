@@ -100,7 +100,7 @@ class ItemBlockList {
 		this.containerElement.appendChild(this.listElement);
 		if(!this.namesList.length) {
 			this.namesList = await this.source.getList(cacheOnly);
-			this.sortedNamesList = this.namesList.map(n => n.toLowerCase()).toSorted().toReversed();
+			this.sortedNamesList = this.namesList.toSorted().toReversed();
 		}
 		await this.fillContent(true);
 		this.isInitialised = true;
@@ -118,7 +118,7 @@ class ItemBlockList {
 
 	async updateList() {
 		this.namesList = await this.source.getList();
-		this.sortedNamesList = this.namesList.map(n => n.toLowerCase()).toSorted().toReversed();
+		this.sortedNamesList = this.namesList.toSorted().toReversed();
 		// console.log('updateList()', this.namesList);
 		
 		Utilities.clearChildren(this.listElement);
@@ -143,12 +143,12 @@ class ItemBlockList {
 		}
 		let anyMatch = false;
 		for(let name of this.sortedNamesList.toSorted((a, b) => {
-			const ia = a.indexOf(searchstring.toLowerCase());
-			const ib = b.indexOf(searchstring.toLowerCase());
+			const ia = a.toLowerCase().indexOf(searchstring.toLowerCase());
+			const ib = b.toLowerCase().indexOf(searchstring.toLowerCase());
 			const res1 = Math.sign((ib < 0 ? Infinity : ib) - (ia < 0 ? Infinity : ia));
 			return res1 === 0 ? Number(a < b) : res1;
 		})) {
-			if(name.includes(searchstring.toLowerCase())) {
+			if(name.toLowerCase().includes(searchstring.toLowerCase())) {
 				anyMatch = true;
 				await this.addItemBlock(name, true);
 			}
